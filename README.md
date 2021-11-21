@@ -4,15 +4,15 @@ Join me as I map the city at the centre of my fantasy world, Mundoko.
 
 ## Why
 
-1. It provides the spaces within which the stories of my world take place
-1. Others might want to share knowledge on how we map our game worlds
-1. I enjoy drawing maps and creating this place
+1. The story-telling and gameplay benefits from a consistent setting
+2. I enjoy drawing maps and building this world from my imagination
+3. You might like to share knowledge on approaches to mapping a game world
 
 ## What
 
 - [x] **Pathfinder** and **Dungeons & Dragons** compatible scales (5' squares, feet and miles)
 - [x] Well considered grid and co-ordinate system
-- [ ] Millions of handdrawn maps, from global scale right down to floorplans
+- [ ] Millions of handdrawn maps, from extra-global scale right down to floorplans
 
 ## Notes
 
