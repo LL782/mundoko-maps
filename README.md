@@ -25,12 +25,17 @@ Hand made, automagical technology for mapping a fantasy city
 1. The intention here is to build software that supports people who want to hand-draw maps of their imaginary worlds
 1. This system is designed to be compatible with [Pathfinder](https://en.wikipedia.org/wiki/Pathfinder_Roleplaying_Game) and may well translate to [Dungeons & Dragons](https://en.wikipedia.org/wiki/Dungeons_%26_Dragons) and other table top RPGs
 
-### System Context
+### Tech Vision
 
-Here's a picture to help visualise who will use this "system" and how the different parts of it interact with one another.
+A couple of pictures to help visualise who will use this tech and how the different parts of it will interact with one another
 
-![C4 Model - Tile Maker – Context](https://user-images.githubusercontent.com/353044/143956399-ca462c6b-a0a8-49f6-9bf8-ec7696c681c1.jpg)
+#### System context
 
-_☝️ Here I've named three systems – Mundoku Maps, Tile Enhancer and Tile Maker. The Tile Maker is the most unusual of the three. I see it receiving a small scale map tile and auto-generating all the larger scale tiles that would be needed to cover the same area. That sounds like the next thing to build/diagram/document._ 
+<img alt="C4 Model - Mundoko Maps – Context Diagram" src="https://user-images.githubusercontent.com/353044/144146482-40647a5e-e221-4ebd-a67b-f4b1f478a31b.jpg" width="600" />
+
+#### Containers in the system
+
+<img alt="C4 Model - Mundoko Maps – Container Diagram" src="https://user-images.githubusercontent.com/353044/144146481-c0b7d5f0-de5a-48d3-a9a1-5691ad83abae.jpg" width="600" />
+
 
 None of this has been built yet. It's still in the early days of ideation.
