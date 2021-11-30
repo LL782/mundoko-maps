@@ -1,4 +1,4 @@
-# 🧙🏾‍♀️ Mundoku Maps 🗺
+# 🧙🏾‍♀️ Mundoko Maps 🗺
 
 Hand made, automagical technology for mapping a fantasy city
 
