@@ -21,7 +21,7 @@ Hand made, automagical technology for mapping a fantasy city
 
 ## Notes 📝 👨🏿‍💻 🔭
 
-1. This is a work in progress that may never be finished
+1. This is a hobby project, practicing async, laid-back communication
 1. The intention here is to build software that supports people who want to hand-draw maps of their imaginary worlds
 1. This system is designed to be compatible with [Pathfinder](https://en.wikipedia.org/wiki/Pathfinder_Roleplaying_Game) and may well translate to [Dungeons & Dragons](https://en.wikipedia.org/wiki/Dungeons_%26_Dragons) and other table top RPGs
 
