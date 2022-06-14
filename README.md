@@ -8,7 +8,7 @@ Hand made, automagical technology for mapping a fantasy city
 
 ---
 
-For a typical [GETTING-STARTED](/app/README.md) head into the [`app`](./app/) directory
+For a typical ["Getting Started" README.md](/app/README.md) head into the [`app`](./app/) directory 💻
 
 ---
 
@@ -21,13 +21,17 @@ For a typical [GETTING-STARTED](/app/README.md) head into the [`app`](./app/) di
 ## What 🐉 ⚔️ 🎲
 
 - [x] **Pathfinder** and **Dungeons & Dragons** compatible units and scales
-- [x] A highly opinionated grid, scale, co-ordinate and page size system
-- [ ] Millions of map tiles, from extra-global scale right down to floorplans
+- [x] A highly opinionated grid, scale, co-ordinate and page-size system worked out
+- [ ] Details of the grid, scale, co-ordinate and page-size system, publically available
+- [ ] Software to navigate these maps publically through a web browser
+- [ ] Software to generate templates for drawing the missing maps or retouching the existing ones
+- [ ] Millions of map tiles drawn based on this system, from extra-global scale right down to floorplans
 
 ## Notes 📝 👨🏿‍💻 🔭
 
 1. This is a hobby project, practicing async, laid-back communication
-1. The intention here is to build software that supports people who want to hand-draw maps of their imaginary worlds
+1. We're building software to supports people who want to hand-draw maps of their imaginary worlds
+1. And we're using the software to help us map our own fantasy world at [**maps.mundoko.world**](https://maps.mundoko.world)
 1. This system is designed to be compatible with [Pathfinder](https://en.wikipedia.org/wiki/Pathfinder_Roleplaying_Game) and may well translate to [Dungeons & Dragons](https://en.wikipedia.org/wiki/Dungeons_%26_Dragons) and other table top RPGs
 
 ### Tech Vision
