@@ -1,0 +1,71 @@
+.margin {
+  display: flex;
+  justify-content: space-between;
+  margin: 0;
+  padding: 0;
+  position: absolute;
+}
+
+.marker:nth-child(1),
+.marker:nth-child(11) {
+  visibility: hidden;
+}
+
+@media screen and (max-width: 400px) {
+  .margin .marker:nth-child(2),
+  .margin .marker:nth-child(3),
+  .margin .marker:nth-child(4),
+  .margin .marker:nth-child(5),
+  .margin .marker:nth-child(7),
+  .margin .marker:nth-child(8),
+  .margin .marker:nth-child(9),
+  .margin .marker:nth-child(10) {
+    display: none;
+  }
+}
+@media screen and (min-width: 401px) and (max-width: 600px) {
+  .margin .marker:nth-child(2),
+  .margin .marker:nth-child(4),
+  .margin .marker:nth-child(6),
+  .margin .marker:nth-child(8),
+  .margin .marker:nth-child(10) {
+    display: none;
+  }
+}
+
+.marker {
+  border-width: 5px 0 0;
+  border-style: solid;
+  border-image: repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 49%,
+      black,
+      transparent 51%,
+      transparent
+    )
+    1;
+  list-style: none;
+  margin: 0;
+  text-align: center;
+  height: 20px;
+  width: 9.09090909%; /* 100 / 11 */
+}
+
+.westEastMargin {
+  bottom: -25px;
+  left: -5%;
+  right: -5%;
+}
+
+.northSouthMargin {
+  height: 20px;
+  transform: rotate(90deg) translate(-10px, calc(-50vw + 15px));
+  top: 50%;
+  left: -5%;
+  right: -5%;
+}
+
+.northSouthMargin .marker {
+  transform: rotate(180deg);
+}

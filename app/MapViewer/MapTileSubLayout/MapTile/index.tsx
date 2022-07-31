@@ -1,5 +1,5 @@
 import Image from "next/image";
-import mapImg from "../../public/working-tile.webp";
+import mapImg from "../../../public/working-tile.webp";
 
 export const MapTile = () => (
   <Image

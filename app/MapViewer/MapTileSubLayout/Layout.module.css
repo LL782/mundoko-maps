@@ -1,0 +1,9 @@
+.container {
+  margin: 30px;
+}
+
+.centreSquare {
+  border: 1px solid #0003;
+  position: relative;
+  margin-bottom: 50px;
+}

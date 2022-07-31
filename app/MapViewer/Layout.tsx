@@ -1,11 +1,12 @@
-import { MapPositionBar } from "./Components/MapPositionBar";
-import { MapTile } from "./Components/MapTile";
-import { MapTitle } from "./Components/MapTitle";
+import style from "./Layout.module.css";
+import { MapPositionBar } from "./MapPositionBar";
+import { MapTitle } from "./MapTitle/MapTitle";
+import { MapTileSubLayout } from "./MapTileSubLayout/Layout";
 
 export const MapViewLayout = () => (
-  <>
+  <div className={style.container}>
     <MapTitle />
-    <MapTile />
+    <MapTileSubLayout />
     <MapPositionBar />
-  </>
+  </div>
 );
