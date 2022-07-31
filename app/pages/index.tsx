@@ -1,8 +1,7 @@
 import type { NextPage } from "next";
 import Head from "next/head";
-import Image from "next/image";
+import { MapViewer } from "../MapViewer/MapViewer";
 import { Favicons } from "../SiteChrome/Favicons";
-import mapImg from "../public/original-map.jpg";
 
 const Home: NextPage = () => {
   return (
@@ -16,13 +15,7 @@ const Home: NextPage = () => {
         <Favicons />
         <meta name="robots" content="noindex,nofollow" />
       </Head>
-      <Image
-        alt="Main map"
-        layout="responsive"
-        placeholder="blur"
-        priority={true}
-        src={mapImg}
-      />
+      <MapViewer />
     </div>
   );
 };
