@@ -1,7 +1,7 @@
 import Image from "next/image";
-import mapImg from "../public/original-map.jpg";
+import mapImg from "../../public/working-tile.webp";
 
-export const MapViewer = () => (
+export const MapTile = () => (
   <Image
     alt="Main map"
     layout="responsive"

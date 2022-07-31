@@ -1,6 +1,6 @@
 import type { NextPage } from "next";
 import Head from "next/head";
-import { MapViewer } from "../MapViewer/MapViewer";
+import { MapViewer } from "../MapViewer";
 import { Favicons } from "../SiteChrome/Favicons";
 
 const Home: NextPage = () => {
