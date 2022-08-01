@@ -1,6 +1,5 @@
 .container {
   display: flex;
-  margin: 10px;
 }
 .title {
   border: 1px solid black;

@@ -60,11 +60,22 @@
 
 .northSouthMargin {
   height: 20px;
-  transform: rotate(90deg) translate(-10px, calc(-1 * ((50vw - 40px) + 30px)));
   top: 50%;
   left: -5%;
   right: -5%;
 }
+@media (min-aspect-ratio: 1/1) {
+  .northSouthMargin {
+    transform: rotate(90deg) translate(-10px, calc(-50vh + 10px));
+  }
+}
+
+@media (max-aspect-ratio: 1/1) {
+  .northSouthMargin {
+    transform: rotate(90deg) translate(-10px, calc(-1 * ((50vw - 40px) + 30px)));
+  }
+}
+
 
 .northSouthMargin .marker {
   transform: rotate(180deg);
