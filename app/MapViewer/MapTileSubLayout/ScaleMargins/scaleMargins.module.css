@@ -34,10 +34,43 @@
 }
 
 .marker {
-  border-width: 5px 0 0;
   border-style: solid;
+  list-style: none;
+  margin: 0;
+  text-align: center;
+}
+
+.westEastMargin {
+  left: -5%;
+  right: -5%;
+}
+
+.northSouthMargin {
+  bottom: -5%;
+  right: -20px;
+  top: -5%;
+  writing-mode: tb;
+}
+
+.westEastMargin .marker {
+    border-image: repeating-linear-gradient(
+        90deg,
+        transparent,
+        transparent 49%,
+        black,
+        transparent 51%,
+        transparent
+      )
+      1;
+    border-top: 5px solid;
+    height: 20px;
+    width: 9.09090909%; /* 100 / 11 */
+
+}
+
+.northSouthMargin .marker {
   border-image: repeating-linear-gradient(
-      90deg,
+      0deg,
       transparent,
       transparent 49%,
       black,
@@ -45,37 +78,13 @@
       transparent
     )
     1;
-  list-style: none;
-  margin: 0;
-  text-align: center;
-  height: 20px;
-  width: 9.09090909%; /* 100 / 11 */
-}
+  border-right: 5px solid;
+  height: 9.09090909%;
+  width: 20px;
 
-.westEastMargin {
-  bottom: -20px;
-  left: -5%;
-  right: -5%;
-}
 
-.northSouthMargin {
-  height: 20px;
-  top: 50%;
-  left: -5%;
-  right: -5%;
-}
-@media (min-aspect-ratio: 1/1) {
-  .northSouthMargin {
-    transform: rotate(90deg) translate(-10px, calc(-50vh + 10px));
-  }
-}
 
-@media (max-aspect-ratio: 1/1) {
-  .northSouthMargin {
-    transform: rotate(90deg) translate(-10px, calc(-1 * ((50vw - 40px) + 30px)));
-  }
 }
-
 
 .northSouthMargin .marker {
   transform: rotate(180deg);
