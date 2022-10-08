@@ -2,10 +2,15 @@ import style from "./Layout.module.css";
 import { MapPositionBar } from "./MapPositionBar";
 import { MapTitle } from "./MapTitle/MapTitle";
 import { MapTileSubLayout } from "./MapTileSubLayout/Layout";
+import { PagePosition } from "../types/PagePosition";
 
-export const MapViewLayout = () => (
+interface Props {
+  position: PagePosition;
+}
+
+export const MapViewLayout = ({ position }: Props) => (
   <div className={style.container}>
-    <MapTitle />
+    <MapTitle position={position} />
     <MapTileSubLayout />
     <MapPositionBar />
   </div>

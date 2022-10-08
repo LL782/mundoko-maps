@@ -1,3 +1,10 @@
+import { PagePosition } from "../types/PagePosition";
 import { MapViewLayout } from "./Layout";
 
-export const MapViewer = () => <MapViewLayout />;
+interface Props {
+  position: PagePosition;
+}
+
+export const MapViewer = ({ position }: Props) => (
+  <MapViewLayout position={position} />
+);
