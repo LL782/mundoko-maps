@@ -40,7 +40,7 @@ const MapPage: NextPage<Props> = ({ position }) => {
 
 export async function getStaticPaths() {
   const preGeneratedPaths: Array<{ params: PositionParams }> = [
-    { params: { scale: "City", east: "5135", south: "5155" } },
+    { params: { scale: "city", east: "5135", south: "5155" } },
   ];
 
   return {
