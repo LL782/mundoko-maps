@@ -1,36 +1,33 @@
-import Image from "next/image";
-import { FormEventHandler, InputHTMLAttributes } from "react";
-import mapImg from "../public/working-tile.webp";
 import style from "./MapSlice.module.css";
 
 export const MapSlice = () => {
-  const handleInput: FormEventHandler<HTMLInputElement> = async (e) => {
-    e.stopPropagation();
-    e.preventDefault();
-    const {
-      target: { files },
-    } = e;
-    try {
-      const file = files[0];
-
-      let reader = new FileReader();
-      reader.onload = async function () {
-        const res = await fetch("/api/map", {
-          method: "POST",
-          body: reader.result,
-        });
-        console.log("res", res);
-      };
-      await reader.readAsDataURL(file);
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
   return (
-    <div className={style.image}>
-      <Image alt="Main map" layout="responsive" src={mapImg} />
-      <input type="file" name="upload" id="upload" onInput={handleInput} />
-    </div>
+    <article className={style.post}>
+      <h1>Notes about Maps Slice</h1>
+      <p>
+        I tried to use <a href="https://www.npmjs.com/package/jimp">jimp</a> in
+        combination with an uploaded image and didn&apos;t get very far.
+      </p>
+      <ul>
+        <li>Maybe I could research this specifically</li>
+        <li>
+          My trouble seemed to be passing a file from the browser to a node
+          environment
+        </li>
+        <li>Running a node script locally should work</li>
+        <li>
+          Also, jimp seem to expect the images to be referenced by a path,
+          including to a remote file
+        </li>
+        <li>Perhaps I could aim for an image on the CDN</li>
+      </ul>
+      <h2>Next steps</h2>
+      <ol>
+        <li>
+          May try Jimp via a node script in the terminal referencing my local
+          file-system
+        </li>
+      </ol>
+    </article>
   );
 };

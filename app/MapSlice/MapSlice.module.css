@@ -1,13 +1,4 @@
-.image {
+.post {
   margin: 0 auto;
-  width: 20cm;
-}
-
-.button {
-  cursor: pointer;
-  display: block;
-  width: 100%;
-  max-width: 320px;
-  margin-top: 1rem;
-  font-size: 1rem;
+  width: 600px;
 }

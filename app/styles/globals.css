@@ -1,3 +1,7 @@
+html {
+  font-size: 1px;
+}
+
 html,
 body {
   padding: 0;
@@ -5,6 +9,10 @@ body {
   font-family: monospace;
   text-transform: uppercase;
   letter-spacing: 0.1em;
+}
+
+body {
+  font-size: 14rem;
 }
 
 a {

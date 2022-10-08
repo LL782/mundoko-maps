@@ -1,9 +1,23 @@
+.container {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 10rem 0;
+}
+
 .title {
+  margin: 0;
   border-bottom: 1px solid black;
   display: inline-block;
-  font-size: 18px;
+  font-size: 1.2em;
+  padding-bottom: 10rem;
   font-weight: normal;
   line-height: 1;
-  margin: 10px auto;
-  padding-bottom: 10px;
+}
+
+.subtitle {
+  display: inline-block;
+  font-weight: normal;
+  font-size: 1em;
+  margin: 0 2em;
 }

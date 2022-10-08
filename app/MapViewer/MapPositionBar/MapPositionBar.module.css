@@ -1,6 +1,7 @@
 .container {
   display: flex;
 }
+
 .title {
   border: 1px solid black;
   font-size: 15px;
@@ -8,10 +9,6 @@
   line-height: 1;
   margin: 0 auto;
   padding: 0.75em 1.25em;
-}
-
-.scaleText {
-  margin-right: 1em;
 }
 
 .positionText {
