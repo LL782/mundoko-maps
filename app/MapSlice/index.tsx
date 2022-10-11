@@ -10,10 +10,9 @@ export const MapSlice = () => (
           in combination with an uploaded image and didn&apos;t get very far.
         </p>
         <ul>
-          <li>Maybe I could research this specifically</li>
           <li>
-            My trouble seemed to be passing a file from the browser to a node
-            environment
+            Maybe I could research this specifically. My trouble seemed to be
+            with passing a file from the browser to a node server
           </li>
           <li>
             Running a node script locally should work, giving Jimp the path to
