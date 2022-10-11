@@ -1,33 +1,45 @@
-.post {
-  margin: 0 auto;
+.page {
+  margin: 20rem;
   font-size: 10rem;
   line-height: 20rem;
   width: 500rem;
 }
 
-.post h1 {
-  font-size: 30rem;
-  line-height: 40rem;
+.header {
+  font-size: 40rem;
+  line-height: 60rem;
   margin: 40rem 0 20rem;
 }
 
-.post h2 {
+.header a {
+  display: inline-block;
+  padding-bottom: 9rem;
+  border-bottom: 1rem solid black;
+}
+
+.page h2 {
+  font-size: 30rem;
+  line-height: 40rem;
+  margin: 20rem 0 20rem;
+}
+
+.page h3 {
   font-size: 20rem;
   line-height: 30rem;
   margin: 30rem 0 10rem;
 }
 
-.post p {
+.page p {
   margin-bottom: 10rem;
 }
 
-.post ul,
-.post ol {
+.page ul,
+.page ol {
   margin: 0 10rem 20rem;
   padding: 0 10rem;
 }
 
-.post li {
+.page li {
   margin: 0;
   padding: 10rem;
 }
