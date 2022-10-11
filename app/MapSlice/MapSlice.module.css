@@ -1,4 +1,33 @@
 .post {
   margin: 0 auto;
-  width: 600px;
+  font-size: 10rem;
+  line-height: 20rem;
+  width: 500rem;
+}
+
+.post h1 {
+  font-size: 30rem;
+  line-height: 40rem;
+  margin: 40rem 0 20rem;
+}
+
+.post h2 {
+  font-size: 20rem;
+  line-height: 30rem;
+  margin: 30rem 0 10rem;
+}
+
+.post p {
+  margin-bottom: 10rem;
+}
+
+.post ul,
+.post ol {
+  margin: 0 10rem 20rem;
+  padding: 0 10rem;
+}
+
+.post li {
+  margin: 0;
+  padding: 10rem;
 }
