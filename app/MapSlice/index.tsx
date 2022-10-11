@@ -10,7 +10,7 @@ export const MapSlice = () => {
         </Link>
       </h1>
       <article>
-        <h2>Notes about Maps Slice</h2>
+        <h2>Notes about Slicing Tiles</h2>
         <p>
           I tried to use <a href="https://www.npmjs.com/package/jimp">Jimp</a>{" "}
           in combination with an uploaded image and didn&apos;t get very far.
@@ -21,21 +21,25 @@ export const MapSlice = () => {
             My trouble seemed to be passing a file from the browser to a node
             environment
           </li>
-          <li>Running a node script locally should work</li>
           <li>
-            Alt, the path to an image can be a URL, so I could aim for an image
+            Running a node script locally should work, giving Jimp the path to
+            an image on my file system
+          </li>
+          <li>
+            Alt., the path to an image can be a URL, so I could aim for an image
             on the CDN
           </li>
         </ul>
         <h3>Next direction options</h3>
         <ol>
+          <li>May try Jimp via a node script in the terminal</li>
           <li>
-            May try Jimp via a node script in the terminal referencing my local
-            file-system
+            May try zooming, scaling and overflow:hidden-ing an image in HTML,
+            and then printing them
           </li>
           <li>
-            May try zooming, scaling and overflow:hidden-ing img elements in
-            HTML and printing them
+            What I want is to generate a missing image tile based on slicing one
+            from a larger scale (or stitching several from a smaller scale)
           </li>
         </ol>
       </article>
