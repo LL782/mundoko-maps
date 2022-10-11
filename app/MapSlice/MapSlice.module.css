@@ -33,10 +33,27 @@
   margin-bottom: 10rem;
 }
 
+.page ol {
+  padding: 0 10rem 0 0;
+}
+
+.page ol li {
+  margin-left: 25rem;
+  padding-left: 5rem;
+}
+
+.page ul {
+  padding: 0 10rem;
+}
+
+.page ul li {
+  margin-left: 5rem;
+  padding-left: 15rem;
+}
+
 .page ul,
 .page ol {
-  margin: 0 10rem 20rem;
-  padding: 0 10rem;
+  margin: 10rem;
 }
 
 .page li {
