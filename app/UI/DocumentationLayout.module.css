@@ -2,7 +2,7 @@
   margin: 20rem;
   font-size: 10rem;
   line-height: 20rem;
-  width: 500rem;
+  max-width: 500rem;
 }
 
 .header {
