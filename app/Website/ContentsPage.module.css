@@ -1,0 +1,14 @@
+.main {
+  padding: 20rem;
+}
+
+.list {
+  line-height: 1;
+}
+
+.list a {
+  border-bottom: 1px solid black;
+  display: inline-block;
+  padding-bottom: 9rem;
+  margin: 10rem 0;
+}
