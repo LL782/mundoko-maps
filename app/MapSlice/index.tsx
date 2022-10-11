@@ -1,15 +1,9 @@
-import Link from "next/link";
-import style from "./MapSlice.module.css";
+import { DocumentationLayout } from "../UI/DocumentationLayout";
 
-export const MapSlice = () => {
-  return (
-    <main className={style.page}>
-      <h1 className={style.header}>
-        <Link href="/">
-          <a>Mundoko Maps</a>
-        </Link>
-      </h1>
-      <article>
+export const MapSlice = () => (
+  <DocumentationLayout
+    article={
+      <>
         <h2>Notes about Slicing Tiles</h2>
         <p>
           I tried to use <a href="https://www.npmjs.com/package/jimp">Jimp</a>{" "}
@@ -42,7 +36,7 @@ export const MapSlice = () => {
             from a larger scale (or stitching several from a smaller scale)
           </li>
         </ol>
-      </article>
-    </main>
-  );
-};
+      </>
+    }
+  />
+);

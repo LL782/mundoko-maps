@@ -17,6 +17,11 @@
   border-bottom: 1rem solid black;
 }
 
+.header a:hover,
+.header a:focus {
+  background-color: #7affaa33;
+}
+
 .page h2 {
   font-size: 30rem;
   line-height: 40rem;
