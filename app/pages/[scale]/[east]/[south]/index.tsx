@@ -45,7 +45,7 @@ export async function getStaticPaths() {
 
   return {
     paths: preGeneratedPaths,
-    fallback: false,
+    fallback: true,
   };
 }
 
@@ -73,7 +73,7 @@ export async function getStaticProps(c: GetStaticPropsContext<PositionParams>) {
 export default MapPage;
 
 function convert(s: string) {
-  return Number.parseFloat(`0.${s}`) * 1e7;
+  return Number.parseFloat(`0.${s}`) * 1e8;
 }
 
 function getScale(s: string): PageScale | null {

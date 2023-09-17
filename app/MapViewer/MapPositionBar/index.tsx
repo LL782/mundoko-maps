@@ -6,7 +6,7 @@ export const MapPositionBar = () => (
       <span className={style.positionText}>
         SCALE: Feet
         <span className={style.x}> x </span>10
-        <sup className={style.sup}>3</sup>
+        <sup className={style.sup}>4</sup>
       </span>
     </h2>
   </div>
