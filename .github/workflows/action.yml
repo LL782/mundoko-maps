@@ -14,7 +14,6 @@ jobs:
         with:
           project-url: https://github.com/users/LL782/projects/1/
           github-token: ${{ secrets.ADD_TO_PROJECT_PAT_LL782_OVERVIEW }}
-
   add-to-the-mundoko-maps:
     name: Add issue to Mundoko Maps
     runs-on: ubuntu-latest
