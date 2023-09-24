@@ -8,7 +8,7 @@ Hand made, automagical technology for mapping a fantasy city
 
 ---
 
-For a typical "Getting Started" [README](/app/README.md) head into the [`Code`](./Code/) directory 💻
+For a typical "Getting Started" [README](/app/README.md) head into [`./Mundoko-Maps`](./Mundoko-Maps/) for the code etc. 💻
 
 ---
 
