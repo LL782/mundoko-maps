@@ -1,6 +1,6 @@
 import { DocumentationLayout } from "../UI/DocumentationLayout";
 
-export const MapSlice = () => (
+export const MapSliceDocs = () => (
   <DocumentationLayout
     article={
       <>

@@ -28,7 +28,7 @@ export const ContentsPage = () => (
                 </Link>
               </li>
               <li>
-                <Link href="/map-slice">Map Slice</Link>
+                <Link href="/docs/map-slice">Map Slice</Link>
               </li>
             </ol>
           </li>
