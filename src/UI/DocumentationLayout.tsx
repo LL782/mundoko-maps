@@ -9,7 +9,7 @@ export const DocumentationLayout = ({ article }: Props) => (
   <main className={style.page}>
     <h1 className={style.header}>
       <Link href="/">
-        <a href="/">Mundoko Maps</a>
+        Mundoko Maps
       </Link>
     </h1>
     <article>{article}</article>
