@@ -1,38 +1,49 @@
-# App
+# 🧙🏾‍♀️ Mundoko Maps 🗺
 
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+Hand made, automagical technology for mapping a fantasy city
 
-The [README.md](/README.md) at the root of this repository has more about the project in general.
+---
 
-## Getting Started
+ℹ️ **Pre-alpha** means this really isn't ready for public use but we'd love collaboration 👍
 
-First, run the development server:
+---
 
-```bash
-pnpm run dev
-```
+For a typical "Getting Started" [README](/Code/README.md) head into the [`Code`](./Code/) directory 💻
 
-_You might have to [install pnpm](https://pnpm.io/installation)_
+---
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Why 🧮 👩‍🎨 🪐
 
-You can find all routes inside the pages directory, e.g. `pages/index.tsx`. The pages auto-update as you edit the files.
+1. Story based games benefits from half decent maps and _locational consistency_
+2. Personally I love drawing maps and creating an imaginary world
+3. Open-source means we can share knowledge, resources and all that good stuff
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+## What 🐉 ⚔️ 🎲
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+- [x] **Pathfinder** and **Dungeons & Dragons** compatible units and scales
+- [x] A highly opinionated grid, scale, co-ordinate and page-size system worked out
+- [ ] Details of the grid, scale, co-ordinate and page-size system, publically available
+- [ ] Software to navigate these maps publically through a web browser
+- [ ] Software to generate templates for drawing the missing maps or retouching the existing ones
+- [ ] Millions of map tiles drawn based on this system, from extra-global scale right down to floorplans
 
-## Learn More
+## Notes 📝 👨🏿‍💻 🔭
 
-To learn more about Next.js, take a look at the following resources:
+1. This is a hobby project, practicing async, laid-back communication
+1. We're building software to supports people who want to hand-draw maps of their imaginary worlds
+1. And we're using the software to help us map our own fantasy world at [**maps.mundoko.world**](https://maps.mundoko.world)
+1. This system is designed to be compatible with [Pathfinder](https://en.wikipedia.org/wiki/Pathfinder_Roleplaying_Game) and may well translate to [Dungeons & Dragons](https://en.wikipedia.org/wiki/Dungeons_%26_Dragons) and other table top RPGs
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Tech Vision
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+A couple of pictures to help visualise who will use this tech and how the different parts of it will interact with one another
 
-## Deployment
+#### System context
 
-We're using the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js – the easiest way to deploy your Next.js app.
+<img alt="C4 Model - Mundoko Maps – Context Diagram" src="https://user-images.githubusercontent.com/353044/144146482-40647a5e-e221-4ebd-a67b-f4b1f478a31b.jpg" width="600" />
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+#### Containers in the system
+
+<img alt="C4 Model - Mundoko Maps – Container Diagram" src="https://user-images.githubusercontent.com/353044/144146481-c0b7d5f0-de5a-48d3-a9a1-5691ad83abae.jpg" width="600" />
+
+None of this has been built yet. It's still in the early days of ideation.
