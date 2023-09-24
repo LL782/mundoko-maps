@@ -1,5 +1,5 @@
 import Image from "next/image";
-import img from "../public/key+scale_bars.webp";
+import img from "../../public/key+scale_bars.webp";
 
 export const MapKeyAndScaleBars = () => (
   <Image
@@ -9,7 +9,9 @@ export const MapKeyAndScaleBars = () => (
     src={img}
     sizes="100vw"
     style={{
+      display: "block",
       width: "100%",
-      height: "auto"
-    }} />
+      height: "auto",
+    }}
+  />
 );

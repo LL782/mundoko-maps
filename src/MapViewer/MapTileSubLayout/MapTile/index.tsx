@@ -1,15 +1,17 @@
 import Image from "next/image";
-import mapImg from "../../../public/working-tile.webp";
+import img from "../../../../public/working-tile.webp";
 
 export const MapTile = () => (
   <Image
     alt="Main map"
     placeholder="blur"
     priority={true}
-    src={mapImg}
+    src={img}
     sizes="100vw"
     style={{
+      display: "block",
       width: "100%",
-      height: "auto"
-    }} />
+      height: "auto",
+    }}
+  />
 );
