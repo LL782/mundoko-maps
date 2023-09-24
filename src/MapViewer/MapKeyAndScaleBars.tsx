@@ -1,4 +1,4 @@
-import Image from "next/image";
+import Image from "next/legacy/image";
 import img from "../public/key+scale_bars.webp";
 
 export const MapKeyAndScaleBars = () => (
