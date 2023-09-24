@@ -1,12 +1,15 @@
-import Image from "next/legacy/image";
+import Image from "next/image";
 import img from "../public/key+scale_bars.webp";
 
 export const MapKeyAndScaleBars = () => (
   <Image
     alt="Main map"
-    layout="responsive"
     placeholder="blur"
     priority={true}
     src={img}
-  />
+    sizes="100vw"
+    style={{
+      width: "100%",
+      height: "auto"
+    }} />
 );
