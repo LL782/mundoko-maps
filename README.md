@@ -8,7 +8,7 @@ Hand made, automagical technology for mapping a fantasy city
 
 ---
 
-For a typical ["Getting Started" README.md](/app/README.md) head into the [`app`](./app/) directory 💻
+For a typical "Getting Started" [README](/app/README.md) head into the [`Code`](./Code/) directory 💻
 
 ---
 
