@@ -2,7 +2,6 @@ import type { GetStaticPropsContext, NextPage } from "next";
 import Error from "next/error";
 import Head from "next/head";
 import { MapViewer } from "../../../../MapViewer";
-import { Favicons } from "../../../../SiteChrome/Favicons";
 import type {
   PagePosition,
   PositionParams,
@@ -31,7 +30,6 @@ const MapPage: NextPage<Props> = ({ position }) => {
           name="description"
           content="Maps of the World of Mundoko – a sword and sorcery setting for fantasy roleplaying adventure games"
         />
-        <Favicons />
       </Head>
       <MapViewer position={position} />
     </div>

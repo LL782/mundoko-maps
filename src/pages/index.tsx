@@ -1,6 +1,5 @@
 import type { NextPage } from "next";
 import Head from "next/head";
-import { Favicons } from "../SiteChrome/Favicons";
 import { ContentsPage } from "../Website/ContentsPage";
 
 const Home: NextPage = () => {
@@ -12,8 +11,7 @@ const Home: NextPage = () => {
           name="description"
           content="Maps of the World of Mundoko – a sword and sorcery setting for fantasy roleplaying adventure games"
         />
-        <Favicons />
-        <meta name="robots" content="noindex,nofollow" />
+        <meta name="robots" content="index,follow" />
       </Head>
       <ContentsPage />
     </>
