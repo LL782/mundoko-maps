@@ -11,7 +11,7 @@ interface Props {
 export const MapViewLayout = ({ position }: Props) => (
   <div className={style.container}>
     <MapTitle position={position} />
-    <MapTileSubLayout />
+    <MapTileSubLayout position={position} />
     <MapPositionBar />
   </div>
 );
