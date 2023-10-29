@@ -1,12 +1,20 @@
 import { PagePosition } from "../../../types/PagePosition";
 import style from "./scaleMargins.module.css";
+import { getScaleMarginsFrom } from "./getScaleMarginsFrom";
 
 interface Props {
   position: PagePosition;
 }
 
 export const ScaleMargins = ({ position }: Props) => {
-  console.log("position:", position);
+  const {
+    northSouth: { points: northSouthPoints },
+    westEast: { points: westEastPoints },
+  } = getScaleMarginsFrom(position);
+
+  console.log("northSouthPoints:", northSouthPoints);
+  console.log("westEastPoints:", westEastPoints);
+
   return (
     <>
       <ol className={`${style.northSouthMargin} ${style.margin}`}>
