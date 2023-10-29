@@ -24,7 +24,7 @@ const config: Config = {
   // moduleNameMapper: {},
   // modulePathIgnorePatterns: [],
   // notify: false,
-  // preset: undefined,
+  preset: "ts-jest",
   // resetMocks: false,
   // resetModules: false,
   // resolver: undefined,
