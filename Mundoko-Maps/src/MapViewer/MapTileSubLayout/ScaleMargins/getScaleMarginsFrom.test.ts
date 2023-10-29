@@ -27,3 +27,25 @@ describe("given placeholder page position", () => {
     expect(westEastPoints[middleIndex2]).toBe(testPosition.east);
   });
 });
+
+describe("given page position city/1/1", () => {
+  beforeEach(() => {
+    testPosition = { scale: "City", east: 1, south: 1 };
+    result = getScaleMarginsFrom(testPosition);
+    northSouthPoints = result.northSouth.points;
+    westEastPoints = result.westEast.points;
+  });
+
+  it("returns 11 points per margin", () => {
+    expect(northSouthPoints.length).toBe(11);
+    expect(westEastPoints.length).toBe(11);
+  });
+
+  test("input East and South return as central points", () => {
+    const middleIndex1 = Math.round(northSouthPoints.length / 2) - 1;
+    const middleIndex2 = Math.round(westEastPoints.length / 2) - 1;
+
+    expect(northSouthPoints[middleIndex1]).toBe(testPosition.south);
+    expect(westEastPoints[middleIndex2]).toBe(testPosition.east);
+  });
+});
