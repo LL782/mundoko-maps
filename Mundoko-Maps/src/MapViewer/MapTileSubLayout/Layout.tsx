@@ -12,7 +12,7 @@ export const MapTileSubLayout = ({ position }: Props) => (
   <div className={style.container}>
     <div className={style.centreSquare}>
       <MapTile />
-      <ScaleMargins />
+      <ScaleMargins position={position} />
     </div>
     <MapKeyAndScaleBars scale={position.scale} />
   </div>
