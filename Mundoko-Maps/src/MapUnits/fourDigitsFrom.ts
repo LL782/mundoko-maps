@@ -1,3 +1,7 @@
+const MAP_SIZE = 100_000_000;
+const FIDELITY = 10_000;
+const LOOP_POINT = MAP_SIZE / FIDELITY;
+
 class MapMeasurement {
   number: number;
 
@@ -6,12 +10,21 @@ class MapMeasurement {
   }
 
   reduceFidelity = () => {
-    this.number = Math.round(this.number / 10_000);
+    this.number = Math.round(this.number / FIDELITY);
     return this;
   };
 
   loopNumbersAboveMax = () => {
-    this.number = this.number >= 10_000 ? this.number % 10_000 : this.number;
+    if (this.number >= LOOP_POINT) {
+      this.number = this.number % LOOP_POINT;
+    }
+    return this;
+  };
+
+  loopNumbersBelowZero = () => {
+    if (this.number < 0) {
+      this.number = LOOP_POINT + (this.number % LOOP_POINT);
+    }
     return this;
   };
 
@@ -22,5 +35,6 @@ export const fourDigitsFrom = (feet: number) =>
   new MapMeasurement(feet)
     .reduceFidelity()
     .loopNumbersAboveMax()
+    .loopNumbersBelowZero()
     .toString()
     .padStart(4, "0");

@@ -53,6 +53,18 @@ test.each([
     input: 199_995_000,
     output: "0000",
   },
+  {
+    input: -5_000,
+    output: "0000",
+  },
+  {
+    input: -5_001,
+    output: "9999",
+  },
+  {
+    input: -100_005_001,
+    output: "9999",
+  },
 ])('Converts $input to "$output"', ({ input, output }) => {
   expect(fourDigitsFrom(input)).toBe(output);
 });
