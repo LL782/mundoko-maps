@@ -1,2 +1,7 @@
+const reduceFidelity = (feet: number) => Math.round(feet / 10_000);
+
+const loopNumbersAboveMax = (number: number) =>
+  number >= 10_000 ? number % 10_000 : number;
+
 export const fourDigitsFrom = (feet: number) =>
-  (feet / 10000).toString().padStart(4, "0");
+  loopNumbersAboveMax(reduceFidelity(feet)).toString().padStart(4, "0");
