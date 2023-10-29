@@ -1,5 +1,8 @@
 import { PagePosition } from "../../../types/PagePosition";
 
+const fourDigitsFrom = (feet: number) =>
+  (feet / 10_000).toString().padStart(4, "0");
+
 export const getScaleMarginsFrom = (pagePosition: PagePosition) => {
   return {
     northSouth: {
@@ -9,7 +12,7 @@ export const getScaleMarginsFrom = (pagePosition: PagePosition) => {
         "5152",
         "5153",
         "5154",
-        "5155",
+        fourDigitsFrom(pagePosition.south),
         "5156",
         "5157",
         "5158",
@@ -24,7 +27,7 @@ export const getScaleMarginsFrom = (pagePosition: PagePosition) => {
         "5132",
         "5133",
         "5134",
-        "5135",
+        fourDigitsFrom(pagePosition.east),
         "5136",
         "5137",
         "5138",

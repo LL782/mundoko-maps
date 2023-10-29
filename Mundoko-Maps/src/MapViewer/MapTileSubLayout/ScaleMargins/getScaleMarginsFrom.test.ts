@@ -6,12 +6,12 @@ let result: ReturnType<typeof getScaleMarginsFrom>;
 let northSouthPoints: string[];
 let westEastPoints: string[];
 
-describe("given placeholder page position", () => {
+describe("given page position city/1000/2000", () => {
   beforeEach(() => {
     testPosition = {
       scale: "City",
-      east: 51_350_000,
-      south: 51_550_000,
+      east: 10_000_000,
+      south: 20_000_000,
     };
 
     result = getScaleMarginsFrom(testPosition);
@@ -29,11 +29,11 @@ describe("given placeholder page position", () => {
     westEastPoints.forEach((p) => expect(p.length).toBe(4));
   });
 
-  test("input East and South are the central points", () => {
+  test("input East and South are central points", () => {
     const middleIndex1 = Math.round(northSouthPoints.length / 2) - 1;
     const middleIndex2 = Math.round(westEastPoints.length / 2) - 1;
 
-    expect(northSouthPoints[middleIndex1]).toBe("5155");
-    expect(westEastPoints[middleIndex2]).toBe("5135");
+    expect(northSouthPoints[middleIndex1]).toBe("2000");
+    expect(westEastPoints[middleIndex2]).toBe("1000");
   });
 });
