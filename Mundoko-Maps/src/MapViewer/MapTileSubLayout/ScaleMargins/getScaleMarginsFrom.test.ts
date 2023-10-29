@@ -1,16 +1,29 @@
 import { PagePosition } from "../../../types/PagePosition";
 import { getScaleMarginsFrom } from "./getScaleMarginsFrom";
 
-const testPosition: PagePosition = { scale: "City", east: 1, south: 1 };
+let testPosition: PagePosition = {} as any;
+let result: ReturnType<typeof getScaleMarginsFrom>;
+let northSouthPoints: number[];
+let westEastPoints: number[];
 
-describe('for "city" scale', () => {
+describe("given placeholder page position", () => {
   beforeEach(() => {
-    testPosition.scale = "City";
+    testPosition = { scale: "City", east: 5135, south: 5155 };
+    result = getScaleMarginsFrom(testPosition);
+    northSouthPoints = result.northSouth.points;
+    westEastPoints = result.westEast.points;
   });
 
-  it("renders 11 points per margin", () => {
-    const result = getScaleMarginsFrom(testPosition);
-    expect(result.northSouth.points.length).toBe(11);
-    expect(result.westEast.points.length).toBe(11);
+  it("returns 11 points per margin", () => {
+    expect(northSouthPoints.length).toBe(11);
+    expect(westEastPoints.length).toBe(11);
+  });
+
+  test("input East and South return as central points", () => {
+    const middleIndex1 = Math.round(northSouthPoints.length / 2) - 1;
+    const middleIndex2 = Math.round(westEastPoints.length / 2) - 1;
+
+    expect(northSouthPoints[middleIndex1]).toBe(testPosition.south);
+    expect(westEastPoints[middleIndex2]).toBe(testPosition.east);
   });
 });
