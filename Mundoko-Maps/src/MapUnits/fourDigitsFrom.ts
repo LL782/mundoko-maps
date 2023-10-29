@@ -29,12 +29,17 @@ class MapMeasurement {
   };
 
   toString = () => this.number.toString();
+
+  public get value() {
+    if (this.number === -0) {
+      return 0;
+    }
+    return this.number;
+  }
 }
 
 export const fourDigitsFrom = (feet: number) =>
   new MapMeasurement(feet)
     .reduceFidelity()
     .loopNumbersAboveMax()
-    .loopNumbersBelowZero()
-    .toString()
-    .padStart(4, "0");
+    .loopNumbersBelowZero();

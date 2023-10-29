@@ -36,4 +36,9 @@ describe("given page position city/1000/2000", () => {
     expect(northSouthPoints[middleIndex1]).toBe("2000");
     expect(westEastPoints[middleIndex2]).toBe("1000");
   });
+
+  test("North West point is 50,000' North and 50,000' West of centre", () => {
+    expect(northSouthPoints[0]).toBe("1995");
+    expect(westEastPoints[0]).toBe("0995");
+  });
 });
