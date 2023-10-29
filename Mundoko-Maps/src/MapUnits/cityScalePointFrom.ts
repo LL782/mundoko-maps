@@ -2,7 +2,7 @@ const MAP_SIZE = 100_000_000;
 const FIDELITY = 10_000;
 const LOOP_POINT = MAP_SIZE / FIDELITY;
 
-class MapMeasurement {
+class CityScalePoint {
   number: number;
 
   constructor(number: number) {
@@ -38,8 +38,8 @@ class MapMeasurement {
   }
 }
 
-export const fourDigitsFrom = (feet: number) =>
-  new MapMeasurement(feet)
+export const cityScalePointFrom = (feet: number) =>
+  new CityScalePoint(feet)
     .reduceFidelity()
     .loopNumbersAboveMax()
     .loopNumbersBelowZero();

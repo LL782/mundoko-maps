@@ -1,4 +1,4 @@
-import { fourDigitsFrom } from "./fourDigitsFrom";
+import { cityScalePointFrom } from "./cityScalePointFrom";
 
 test.each([
   {
@@ -66,5 +66,5 @@ test.each([
     output: 9_999,
   },
 ])("Converts $input to $output", ({ input, output }) => {
-  expect(fourDigitsFrom(input).value).toBe(output);
+  expect(cityScalePointFrom(input).value).toBe(output);
 });

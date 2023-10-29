@@ -1,9 +1,9 @@
 import { PagePosition } from "../../../types/PagePosition";
-import { fourDigitsFrom } from "../../../MapUnits/fourDigitsFrom";
+import { cityScalePointFrom } from "../../../MapUnits/cityScalePointFrom";
 
 export const getScaleMarginsFrom = (pagePosition: PagePosition) => {
-  const centreOnNorthSouthAxis = fourDigitsFrom(pagePosition.south).value;
-  const centreOnWestEastAxis = fourDigitsFrom(pagePosition.east).value;
+  const centreOnNorthSouthAxis = cityScalePointFrom(pagePosition.south).value;
+  const centreOnWestEastAxis = cityScalePointFrom(pagePosition.east).value;
 
   return {
     northSouth: {
@@ -18,7 +18,7 @@ export const getScaleMarginsFrom = (pagePosition: PagePosition) => {
         "5157",
         "5158",
         "5159",
-        "5160",
+        (centreOnNorthSouthAxis + 5).toString().padStart(4, "0"),
       ],
     },
     westEast: {
@@ -33,7 +33,7 @@ export const getScaleMarginsFrom = (pagePosition: PagePosition) => {
         "5137",
         "5138",
         "5139",
-        "5140",
+        (centreOnWestEastAxis + 5).toString().padStart(4, "0"),
       ],
     },
   };
