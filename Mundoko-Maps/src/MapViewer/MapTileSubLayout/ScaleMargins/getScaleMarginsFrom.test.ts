@@ -46,4 +46,34 @@ describe("given page position city/1000/2000", () => {
     expect(northSouthPoints.pop()).toBe("2005");
     expect(westEastPoints.pop()).toBe("1005");
   });
+
+  test("all the points a calculated correctly", () => {
+    expect(northSouthPoints).toEqual([
+      "1995",
+      "1996",
+      "1997",
+      "1998",
+      "1999",
+      "2000",
+      "2001",
+      "2002",
+      "2003",
+      "2004",
+      "2005",
+    ]);
+
+    expect(westEastPoints).toEqual([
+      "0995",
+      "0996",
+      "0997",
+      "0998",
+      "0999",
+      "1000",
+      "1001",
+      "1002",
+      "1003",
+      "1004",
+      "1005",
+    ]);
+  });
 });
