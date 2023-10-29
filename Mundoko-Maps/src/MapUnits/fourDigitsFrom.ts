@@ -1,7 +1,26 @@
-const reduceFidelity = (feet: number) => Math.round(feet / 10_000);
+class MapMeasurement {
+  number: number;
 
-const loopNumbersAboveMax = (number: number) =>
-  number >= 10_000 ? number % 10_000 : number;
+  constructor(number: number) {
+    this.number = number;
+  }
+
+  reduceFidelity = () => {
+    this.number = Math.round(this.number / 10_000);
+    return this;
+  };
+
+  loopNumbersAboveMax = () => {
+    this.number = this.number >= 10_000 ? this.number % 10_000 : this.number;
+    return this;
+  };
+
+  toString = () => this.number.toString();
+}
 
 export const fourDigitsFrom = (feet: number) =>
-  loopNumbersAboveMax(reduceFidelity(feet)).toString().padStart(4, "0");
+  new MapMeasurement(feet)
+    .reduceFidelity()
+    .loopNumbersAboveMax()
+    .toString()
+    .padStart(4, "0");
