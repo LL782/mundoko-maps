@@ -1,7 +1,5 @@
 import { PagePosition } from "../../../types/PagePosition";
-
-const fourDigitsFrom = (feet: number) =>
-  (feet / 10_000).toString().padStart(4, "0");
+import { fourDigitsFrom } from "../../../MapUnits/fourDigitsFrom";
 
 export const getScaleMarginsFrom = (pagePosition: PagePosition) => {
   return {
