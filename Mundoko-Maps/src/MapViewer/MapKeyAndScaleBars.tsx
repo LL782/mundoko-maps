@@ -6,7 +6,6 @@ interface Props {
 }
 
 export const MapKeyAndScaleBars = ({ scale }: Props) => {
-  console.log("scale:", scale);
   if (scale !== "City") {
     return <>No key and scale bars for {scale} scale</>;
   }
