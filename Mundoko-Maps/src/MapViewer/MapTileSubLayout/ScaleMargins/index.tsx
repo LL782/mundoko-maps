@@ -24,7 +24,7 @@ export const ScaleMargins = ({ position }: Props) => {
   );
 };
 
-const toMarginMarker = (n: number) => (
+const toMarginMarker = (n: string) => (
   <li key={n} className={style.marker}>
     {n}
   </li>
