@@ -2,7 +2,7 @@ import type { Config } from "jest";
 
 const config: Config = {
   // automock: true,
-  bail: 1,
+  // bail: 0,
   clearMocks: true,
   // globalSetup: undefined,
   // globalTeardown: undefined,
