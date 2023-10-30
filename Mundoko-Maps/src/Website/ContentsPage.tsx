@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { DocumentationLayout } from "../UI/DocumentationLayout";
 import style from "./ContentsPage.module.css";
+import Image from "next/image";
 
 export const ContentsPage = () => (
   <DocumentationLayout
@@ -28,7 +29,30 @@ export const ContentsPage = () => (
                 </Link>
               </li>
               <li>
-                <Link href="/docs/map-slice">Map Slice</Link>
+                <Link
+                  href="https://pathfindertools.business.blog/2022/09/21/map-scales-and-grid-squares/"
+                  target="_blank"
+                >
+                  <span>
+                    Map scales, tiles and grids – blog post
+                    <Image
+                      alt="Opens in new tab"
+                      src="/new-tab.png"
+                      width={10}
+                      height={10}
+                      style={{
+                        position: "relative",
+                        left: "3px",
+                        bottom: "-3px",
+                        width: "15px",
+                        height: "auto",
+                      }}
+                    />
+                  </span>
+                </Link>
+              </li>
+              <li>
+                <Link href="/docs/map-slice">Notes about slicing tiles</Link>
               </li>
             </ol>
           </li>
