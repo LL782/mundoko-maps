@@ -1,29 +1,42 @@
 const MAP_SIZE = 100_000_000;
-const FIDELITY = 10_000;
-const LOOP_POINT = MAP_SIZE / FIDELITY;
+
+const FIDELITY = {
+  Extra: 1,
+  Global: 1,
+  State: 100_000,
+  City: 10_000,
+  Town: 1,
+  Hood: 1,
+  Block: 1,
+  Floor: 1,
+} as const;
 
 class MapPoint {
   number: number;
+  fidelity: number;
+  loopPoint: number;
 
-  constructor(number: number) {
+  constructor(number: number, scale: PageScale) {
     this.number = number;
+    this.fidelity = FIDELITY[scale];
+    this.loopPoint = MAP_SIZE / this.fidelity;
   }
 
   reduceFidelity = () => {
-    this.number = Math.round(this.number / FIDELITY);
+    this.number = Math.round(this.number / this.fidelity);
     return this;
   };
 
   loopNumbersAboveMax = () => {
-    if (this.number >= LOOP_POINT) {
-      this.number = this.number % LOOP_POINT;
+    if (this.number >= this.loopPoint) {
+      this.number = this.number % this.loopPoint;
     }
     return this;
   };
 
   loopNumbersBelowZero = () => {
     if (this.number < 0) {
-      this.number = LOOP_POINT + (this.number % LOOP_POINT);
+      this.number = this.loopPoint + (this.number % this.loopPoint);
     }
     return this;
   };
@@ -38,8 +51,8 @@ class MapPoint {
   }
 }
 
-export const feetToMapPoint = (feet: number) =>
-  new MapPoint(feet)
+export const feetToMapPoint = (feet: number, scale: PageScale) =>
+  new MapPoint(feet, scale)
     .reduceFidelity()
     .loopNumbersAboveMax()
     .loopNumbersBelowZero();

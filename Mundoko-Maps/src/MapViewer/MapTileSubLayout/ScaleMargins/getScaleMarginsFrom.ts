@@ -81,9 +81,9 @@ export const getScaleMarginsFrom = (pagePosition: PagePosition) => {
 };
 
 function statePoint(feet: number) {
-  return feetToMapPoint(feet).value.toString().padStart(3, "0");
+  return feetToMapPoint(feet, "State").value.toString().padStart(3, "0");
 }
 
 function cityPoint(feet: number) {
-  return feetToMapPoint(feet).value.toString().padStart(4, "0");
+  return feetToMapPoint(feet, "City").value.toString().padStart(4, "0");
 }
