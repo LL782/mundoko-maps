@@ -1,7 +1,6 @@
 import { PagePosition } from "../../../types/PagePosition";
 import { getScaleMarginsFrom } from "./getScaleMarginsFrom";
 
-let testPosition: PagePosition = {} as any;
 let result: ReturnType<typeof getScaleMarginsFrom>;
 let northSouthPoints: string[];
 let westEastPoints: string[];
@@ -11,6 +10,44 @@ const setupFor = (pagePosition: PagePosition) => {
   northSouthPoints = result.northSouth.points;
   westEastPoints = result.westEast.points;
 };
+
+describe("given State scale", () => {
+  beforeEach(() => {
+    setupFor({
+      scale: "State",
+      east: 51_000_000,
+      south: 51_000_000,
+    });
+  });
+
+  test("11 points are set for each margin", () => {
+    expect(northSouthPoints.length).toBe(11);
+    expect(westEastPoints.length).toBe(11);
+  });
+
+  test("points are three digit strings", () => {
+    northSouthPoints.forEach((p) => expect(p.length).toBe(3));
+    westEastPoints.forEach((p) => expect(p.length).toBe(3));
+  });
+
+  test("East and South from page position are used for centre", () => {
+    const middleIndex1 = Math.round(northSouthPoints.length / 2) - 1;
+    const middleIndex2 = Math.round(westEastPoints.length / 2) - 1;
+
+    expect(northSouthPoints[middleIndex1]).toBe("510");
+    expect(westEastPoints[middleIndex2]).toBe("510");
+  });
+
+  test("North-West corner is 1,000,000' North and 1,000,000' West of centre", () => {
+    expect(northSouthPoints.shift()).toBe("500");
+    expect(westEastPoints.shift()).toBe("500");
+  });
+
+  test("South-East corner is 1,000,000' South and 1,000,000' East of centre", () => {
+    expect(northSouthPoints.pop()).toBe("520");
+    expect(westEastPoints.pop()).toBe("520");
+  });
+});
 
 describe("given City scale", () => {
   beforeEach(() => {

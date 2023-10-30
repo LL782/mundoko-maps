@@ -2,7 +2,7 @@ const MAP_SIZE = 100_000_000;
 const FIDELITY = 10_000;
 const LOOP_POINT = MAP_SIZE / FIDELITY;
 
-class CityScalePoint {
+class MapPoint {
   number: number;
 
   constructor(number: number) {
@@ -38,8 +38,8 @@ class CityScalePoint {
   }
 }
 
-export const cityScalePointFrom = (feet: number) =>
-  new CityScalePoint(feet)
+export const feetToMapPoint = (feet: number) =>
+  new MapPoint(feet)
     .reduceFidelity()
     .loopNumbersAboveMax()
     .loopNumbersBelowZero();

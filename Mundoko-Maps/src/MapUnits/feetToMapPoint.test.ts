@@ -1,4 +1,4 @@
-import { cityScalePointFrom } from "./cityScalePointFrom";
+import { feetToMapPoint } from "./feetToMapPoint";
 
 test.each([
   {
@@ -66,5 +66,5 @@ test.each([
     output: 9_999,
   },
 ])("Converts $input to $output", ({ input, output }) => {
-  expect(cityScalePointFrom(input).value).toBe(output);
+  expect(feetToMapPoint(input).value).toBe(output);
 });
