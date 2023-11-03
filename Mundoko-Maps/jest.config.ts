@@ -30,7 +30,7 @@ const config: Config = {
   // resolver: undefined,
   // restoreMocks: false,
   // setupFiles: [],
-  // setupFilesAfterEnv: [],
+  setupFilesAfterEnv: ["<rootDir>/jest-setup.ts"],
   // slowTestThreshold: 5,
   // snapshotSerializers: [],
   testEnvironment: "jsdom",
@@ -45,7 +45,7 @@ const config: Config = {
   // ],
   // testRegex: [],
   // testResultsProcessor: undefined,
-  // transform: undefined,
+  transform: { "^.+\\.(ts|tsx)$": "ts-jest" },
   // transformIgnorePatterns: [
   //   "/node_modules/",
   //   "\\.pnp\\.[^\\/]+$"
