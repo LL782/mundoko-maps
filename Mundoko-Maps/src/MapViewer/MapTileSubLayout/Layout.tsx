@@ -11,7 +11,7 @@ interface Props {
 export const MapTileSubLayout = ({ position }: Props) => (
   <div className={style.container}>
     <div className={style.centreSquare}>
-      <MapTile />
+      <MapTile position={position} />
       <ScaleMargins position={position} />
     </div>
     <MapKeyAndScaleBars scale={position.scale} />
