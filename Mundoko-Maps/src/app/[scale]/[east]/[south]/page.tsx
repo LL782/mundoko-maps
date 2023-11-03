@@ -48,7 +48,7 @@ export async function generateStaticParams() {
 }
 
 function convert(s: string) {
-  return Number.parseFloat(`0.${s}`) * 1e8;
+  return Math.round(Number.parseFloat(`0.${s}`) * 1e8);
 }
 
 function getScale(s: string): PageScale | null {
