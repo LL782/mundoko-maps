@@ -14,7 +14,7 @@ describe("Given a position that matches an existing tile image", () => {
   });
 
   it("renders that image", () => {
-    expect(screen.getByRole("img")).toBeInTheDocument();
+    expect(screen.getAllByRole("img").length).toBe(1);
   });
 });
 
