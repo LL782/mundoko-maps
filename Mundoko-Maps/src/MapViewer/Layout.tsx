@@ -12,6 +12,6 @@ export const MapViewLayout = ({ position }: Props) => (
   <div className={style.container}>
     <MapTitle position={position} />
     <MapTileSubLayout position={position} />
-    <MapPositionBar />
+    <MapPositionBar scale={position.scale} />
   </div>
 );
