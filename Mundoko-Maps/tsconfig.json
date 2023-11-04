@@ -24,7 +24,8 @@
     "**/*.ts",
     "**/*.tsx",
     "next-env.d.ts",
-    "tsconfig.json"
+    "tsconfig.json",
+    "types.d.ts"
   ],
   "exclude": ["node_modules"]
 }

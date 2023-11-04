@@ -1,6 +1,8 @@
-import type { Config } from "jest";
+import nextJest from "next/jest";
 
-const config: Config = {
+const createJestConfig = nextJest({ dir: "./" });
+
+const config = {
   // automock: true,
   // bail: 0,
   clearMocks: true,
@@ -24,13 +26,13 @@ const config: Config = {
   // moduleNameMapper: {},
   // modulePathIgnorePatterns: [],
   // notify: false,
-  preset: "ts-jest",
+  // preset: undefined,
   // resetMocks: false,
   // resetModules: false,
   // resolver: undefined,
   // restoreMocks: false,
   // setupFiles: [],
-  setupFilesAfterEnv: ["<rootDir>/jest-setup.ts"],
+  setupFilesAfterEnv: ["<rootDir>/jest.setup.ts"],
   // slowTestThreshold: 5,
   // snapshotSerializers: [],
   testEnvironment: "jsdom",
@@ -45,7 +47,7 @@ const config: Config = {
   // ],
   // testRegex: [],
   // testResultsProcessor: undefined,
-  transform: { "^.+\\.(ts|tsx)$": "ts-jest" },
+  // transform: {},
   // transformIgnorePatterns: [
   //   "/node_modules/",
   //   "\\.pnp\\.[^\\/]+$"
@@ -56,4 +58,4 @@ const config: Config = {
   // watchman: true,
 };
 
-export default config;
+export default createJestConfig(config);
