@@ -47,9 +47,9 @@ const TilesFromScaleBelow = ({ position }: { position: PagePosition }) => {
     tiles.push({ key: "tile-" + i, matchingImg: null });
 
   if (
-    (position.scale === "State",
-    position.east === 51350000,
-    position.south === 51550000)
+    position.scale === "State" &&
+    position.east === 51350000 &&
+    position.south === 51550000
   ) {
     tiles[189].matchingImg = existingImage;
   }
@@ -70,7 +70,6 @@ interface PropsTileLayer {
 const TileLayer = ({ children }: PropsTileLayer) => (
   <div
     style={{
-      background: "red",
       position: "absolute",
       opacity: 0.5,
       top: 0,
