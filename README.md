@@ -47,3 +47,14 @@ A couple of pictures to help visualise who will use this tech and how the differ
 <img alt="C4 Model - Mundoko Maps – Container Diagram" src="https://user-images.githubusercontent.com/353044/144146481-c0b7d5f0-de5a-48d3-a9a1-5691ad83abae.jpg" width="600" />
 
 None of this has been built yet. It's still in the early days of ideation.
+
+### Architecture plan
+
+The greenfield design (tech choices, cost, and a build order for a solo / shoestring project) lives in [`docs/architecture/`](./docs/architecture/README.md):
+
+- [System design](./docs/architecture/01-system.md)
+- [Tile Store](./docs/architecture/containers/tile-store.md) (custom CMS — not Contentful)
+- [Map Viewer](./docs/architecture/containers/map-viewer.md)
+- [Map Administrator](./docs/architecture/containers/map-administrator.md)
+- [Detail Capture](./docs/architecture/containers/detail-capture.md)
+- [Guide Generator](./docs/architecture/containers/guide-generator.md)
