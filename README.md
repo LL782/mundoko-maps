@@ -36,14 +36,25 @@ For a typical "Getting Started" [README](/app/README.md) head into [`./Mundoko-M
 
 ### Tech Vision
 
-A couple of pictures to help visualise who will use this tech and how the different parts of it will interact with one another
+A couple of pictures to help visualise who will use this tech and how the different parts of it will interact with one another. These are updated from the original Miro C4 sketches: Tile Store is a **custom CMS** (Postgres + R2, not Contentful), capture and guides run on **Inngest + Sharp** (not AWS Step Functions), and explorers browse through Mundoko Maps rather than hitting the store directly.
 
 #### System context
 
-<img alt="C4 Model - Mundoko Maps – Context Diagram" src="https://user-images.githubusercontent.com/353044/144146482-40647a5e-e221-4ebd-a67b-f4b1f478a31b.jpg" width="600" />
+<img alt="C4 Model - Mundoko Maps – Context Diagram" src="docs/architecture/images/mundoko-maps-context-diagram.jpg" width="600" />
 
 #### Containers in the system
 
-<img alt="C4 Model - Mundoko Maps – Container Diagram" src="https://user-images.githubusercontent.com/353044/144146481-c0b7d5f0-de5a-48d3-a9a1-5691ad83abae.jpg" width="600" />
+<img alt="C4 Model - Mundoko Maps – Container Diagram" src="docs/architecture/images/mundoko-maps-container-diagram.jpg" width="600" />
 
 None of this has been built yet. It's still in the early days of ideation.
+
+### Architecture plan
+
+The greenfield design (tech choices, cost, and a build order for a solo / shoestring project) lives in [`docs/architecture/`](./docs/architecture/README.md):
+
+- [System design](./docs/architecture/01-system.md)
+- [Tile Store](./docs/architecture/containers/tile-store.md) (custom CMS — not Contentful)
+- [Map Viewer](./docs/architecture/containers/map-viewer.md)
+- [Map Administrator](./docs/architecture/containers/map-administrator.md)
+- [Detail Capture](./docs/architecture/containers/detail-capture.md)
+- [Guide Generator](./docs/architecture/containers/guide-generator.md)
