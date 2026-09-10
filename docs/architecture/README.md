@@ -4,6 +4,13 @@ These documents are the build plan for Mundoko Maps: software that helps a map a
 
 They assume a **greenfield** project. Treat this folder as the source of truth for *what to build* and *which tools to use*. Existing prototype code in the repo is a sketch of coordinates and viewer layout, not an architecture to extend.
 
+## Diagrams
+
+Updated C4 views (custom CMS, Inngest + Sharp, explorers go through the app):
+
+- [Context diagram](./images/mundoko-maps-context-diagram.jpg)
+- [Container diagram](./images/mundoko-maps-container-diagram.jpg)
+
 ## How to read this
 
 1. [System design](./01-system.md) — context, containers, tech choices, cost, and build order.

@@ -31,54 +31,15 @@ These constraints outrank architectural fashion.
 
 Two people, one software system, one store of map images and data.
 
-```mermaid
-C4Context
-    title Mundoko Maps — system context
+<img alt="Mundoko Maps context diagram: Map Artist and Map Explorer use Mundoko Maps; Mundoko Maps stores data in a custom Tile Store" src="./images/mundoko-maps-context-diagram.jpg" width="720" />
 
-    Person(artist, "Map Artist", "Author. Draws original tiles and fills in guides.")
-    Person(explorer, "Map Explorer", "Guest. Browses whatever detail exists.")
-    System(mundoko, "Mundoko Maps", "Manages tiles, generates drawing guides, publishes maps.")
-
-    Rel(artist, mundoko, "Downloads guides, uploads finished tiles")
-    Rel(explorer, mundoko, "Browses maps in the browser")
-```
-
-The original vision had explorers talking **directly** to a CMS (Contentful) and the artist talking to Mundoko Maps. That split is dropped. On a shoestring, one app serves both audiences and owns the store. Explorers never see a CMS UI; they hit a public viewer that reads the Tile Store.
-
-```text
-Map Artist ──► Mundoko Maps ──► Tile Store (custom)
-                    ▲                    │
-                    │                    │
-              Map Explorer ◄─────────────┘
-              (via Map Viewer, not raw storage)
-```
+The original vision had explorers talking **directly** to a CMS (Contentful) and the artist talking to Mundoko Maps. That split is dropped. On a shoestring, one app serves both audiences and owns the store. Explorers never see a CMS UI; they hit a public viewer that reads the Tile Store. The Tile Store is a **custom CMS** (Postgres + R2), not Contentful.
 
 ## 4. Containers
 
 Five containers, matching the vision diagram, implemented as **modules in one application** rather than five services.
 
-```mermaid
-flowchart LR
-    artist["Map Artist"]
-    explorer["Map Explorer"]
-
-    subgraph mundoko["Mundoko Maps"]
-        admin["Map Administrator<br/>Next.js /admin"]
-        viewer["Map Viewer<br/>Next.js public"]
-        capture["Detail Capture<br/>Inngest + Sharp"]
-        guides["Guide Generator<br/>Inngest + Sharp"]
-        store["Tile Store<br/>Postgres + R2"]
-    end
-
-    artist -->|upload tiles, download guides| admin
-    explorer -->|browse / print| viewer
-    admin --> capture
-    admin --> guides
-    capture -->|write images + metadata| store
-    guides -->|read tiles, write guide assets| store
-    viewer -->|read published tiles| store
-    admin -->|coverage, preview, publish| store
-```
+<img alt="Mundoko Maps container diagram: Administrator, Viewer, Detail Capture, Guide Generator, and custom Tile Store inside one Next.js app" src="./images/mundoko-maps-container-diagram.jpg" width="720" />
 
 | Container | Kind | One-line job |
 | --- | --- | --- |
