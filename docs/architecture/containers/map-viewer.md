@@ -96,9 +96,9 @@ The current prototype’s “generated tile” (parent ghost + a child mosaic) i
 | Action | Result |
 | --- | --- |
 | N / S / E / W | Adjacent `TileId` at the same scale (kernel `neighbour`). State–Plan wrap at 40,000,000 ft. No pan at Extra or Global. |
-| Scale up | Parent tile (Global → Extra, highlighting this plane). No-op at Extra. |
-| Scale down | Child under the last click, or the centre child. From Extra, enter that cell’s Global. No-op at Plan. |
-| “Start here” | Seeded published tile on the centre plane `{7,7}` |
+| Scale up | Parent tile (Global → Extra, highlighting this layer). No-op at Extra. |
+| Scale down | Child under the last click, or the centre child. From Extra, select that layer and open its Global. No-op at Plan. |
+| “Start here” | Seeded published tile on the centre layer `{7,7}` |
 | Keyboard | Arrow keys for neighbours; optional |
 
 Do not infinite-scroll a sea of tiles. This is a book of pages.

@@ -14,9 +14,9 @@ This is not a general CMS. No page builder, no rich-text blog, no content-model 
 
 ## 2. Responsibilities
 
-- Persist tile records keyed by `(plane, scale, east, south)`.
+- Persist tile records keyed by `(scale, east, south)` within a layer (Global and below). Extra is a singleton.
 - Persist assets (original, web, print, guide) in object storage.
-- Enforce uniqueness: at most one *current* tile per plane + coordinate + scale.
+- Enforce uniqueness: at most one *current* tile per layer + `(scale, east, south)`.
 - Answer coverage queries for a bounding window.
 - Resolve parent and children via the domain kernel, then fetch whatever records exist.
 - Publish / unpublish (draft vs public).
@@ -33,7 +33,7 @@ Out of scope:
 
 | Need | Generic CMS | This store |
 | --- | --- | --- |
-| Identity | Entry id, slugs | `(plane, scale, east, south)` |
+| Identity | Entry id, slugs | `(scale, east, south)` in a layer |
 | “Missing” | Empty entries you must create | Absence of a row |
 | Hierarchy | Reference fields, easy to get wrong | Deterministic parent/child math |
 | Delivery | CDN for a few hero images | Thousands of small tiles, hashed, cache-forever |
@@ -46,7 +46,7 @@ Payload/Directus are closer (you own the DB) but you still fight their admin and
 
 | Piece | Choice | Notes |
 | --- | --- | --- |
-| Metadata | **Postgres** on **Neon** | `UNIQUE (plane_east, plane_south, scale, east, south)`. |
+| Metadata | **Postgres** on **Neon** | `layers` plus `UNIQUE (layer_id, scale, east, south)` on tiles. |
 | Access | **Drizzle ORM** + SQL migrations | Keep tile queries obvious. |
 | Blobs | **Cloudflare R2** | S3-compatible. Zero egress — essential for a public map. |
 | Public delivery | R2 custom domain via Cloudflare | `https://tiles.mundoko.world/{hash}.webp` |
@@ -66,20 +66,25 @@ Payload/Directus are closer (you own the DB) but you still fight their admin and
 Minimal schema for Slices 1–6. Types are indicative.
 
 ```text
+layers
+  id              uuid pk
+  east            int not null    -- Extra chart cell 0..14
+  south           int not null
+  unique (east, south)            -- create a row when that globe is first used
+
 tiles
   id              uuid pk
+  layer_id        uuid fk layers  -- null only for the Extra singleton
   scale           text not null   -- Extra | Global | State | City | Town | Hood | Block | Plan
-  plane_east      int not null    -- 0..14; Extra row uses 0,0
-  plane_south     int not null
   east            bigint not null -- feet; 0 at Extra and Global
-  south           bigint not null -- feet; 0 at Extra and Global
+  south           bigint not null
   status          text not null   -- draft | published
   title           text
   notes           text            -- artist-only
   published_at    timestamptz
   created_at      timestamptz
   updated_at      timestamptz
-  unique (plane_east, plane_south, scale, east, south)
+  unique (layer_id, scale, east, south)
 
 assets
   id              uuid pk
@@ -130,17 +135,19 @@ published   → web art, public
 The rest of the app depends on this module, not on SQL.
 
 ```ts
-getTile(id: TileId): Promise<Tile | null>
-getAsset(id: TileId, kind: AssetKind): Promise<Asset | null>
-listCoverage(scale, window: Bounds): Promise<CoverageCell[]>
-listChildren(id: TileId): Promise<Tile[]> // 0–N² existing rows of the step below
-getParent(id: TileId): Promise<Tile | null>
-upsertDraft(id: TileId, fields): Promise<Tile>
-publish(id: TileId): Promise<void>
-unpublish(id: TileId): Promise<void>
-putAsset(id: TileId, kind, bytes, meta): Promise<Asset>
+getTile(layer: LayerId | null, id: TileId): Promise<Tile | null>
+getAsset(layer: LayerId | null, id: TileId, kind: AssetKind): Promise<Asset | null>
+listCoverage(layer: LayerId, scale, window: Bounds): Promise<CoverageCell[]>
+listChildren(layer: LayerId | null, id: TileId): Promise<Tile[]>
+getParent(layer: LayerId | null, id: TileId): Promise<Tile | null>
+upsertDraft(layer: LayerId | null, id: TileId, fields): Promise<Tile>
+publish(layer: LayerId | null, id: TileId): Promise<void>
+unpublish(layer: LayerId | null, id: TileId): Promise<void>
+putAsset(layer: LayerId | null, id: TileId, kind, bytes, meta): Promise<Asset>
 createJob(...) / updateJob(...) / getJob(...)
 ```
+
+`layer` is `null` only for the Extra singleton. Coverage is always within one layer.
 
 `CoverageCell` is `{ tileId, state }` for every square in the window, including `missing`. The store *computes* missing by walking the window in the domain kernel and left-joining rows.
 
@@ -179,7 +186,8 @@ Expected v1 size: tens to thousands of rows, not millions of *stored* tiles. Pos
 Index:
 
 ```sql
-create unique index tiles_coord on tiles (plane_east, plane_south, scale, east, south);
+create unique index layers_cell on layers (east, south);
+create unique index tiles_coord on tiles (layer_id, scale, east, south);
 create index tiles_scale_status on tiles (scale, status);
 create index assets_tile_kind on assets (tile_id, kind);
 ```
@@ -219,4 +227,4 @@ Done when the Map Viewer can render that seeded tile from the store rather than 
 | Accidental public originals | Separate bucket or prefix; never put `originals/` on the public hostname. |
 | Orphan R2 objects | Accept orphans in v1; a weekly “keys not in `assets`” script later. |
 | Neon cold starts | Viewer should not query on every tile image; images are on R2. HTML can be cached. |
-| Coordinate uniqueness bugs | Unique index; domain kernel is the only writer of `(plane, east, south)` at a scale. |
+| Coordinate uniqueness bugs | Unique index; domain kernel is the only writer of `(east, south)` at a scale **within a layer**. |

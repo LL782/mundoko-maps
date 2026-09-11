@@ -75,7 +75,7 @@ Canvas:
   CELL   = 2400 / N     // 160, 120, 480, 1200, or 240
 ```
 
-A City guide overlays its State parent and a 5×5 of Town children. A Global guide overlays its Extra cell (this plane on the 15×15 chart) and a 20×20 of States.
+A City guide overlays its State parent and a 5×5 of Town children. A Global guide overlays its Extra cell (this layer on the 15×15 chart) and a 20×20 of States.
 
 Opacity: start at **0.35** parent, **0.45** children (children are the detail the artist is consolidating or extending). Adjust after the first real print; store as constants, not UI sliders, in v1.
 
