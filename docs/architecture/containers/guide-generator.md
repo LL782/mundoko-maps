@@ -36,7 +36,7 @@ Out of scope for v1:
 
 ## 3. Why this is a container
 
-Compositing up to **400** images (State→City only) is a different failure mode from “resize one scan.” Other steps are 100, 25, or 4 children. The job still needs chunked steps for the 400-child case, caching, and a clear stale/fresh rule. Keeping it separate from Detail Capture prevents a large mosaic from sharing retries with EXIF rotation.
+Compositing up to 400 images is a different failure mode from “resize one scan.” It needs chunked steps, caching, and a clear stale/fresh rule. Keeping it separate from Detail Capture prevents a 400-tile mosaic from sharing retries with EXIF rotation.
 
 Same *process* (Inngest + Sharp), different *function* and events.
 
