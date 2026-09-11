@@ -58,7 +58,7 @@ Same *process* (Inngest + Sharp), different *function* and events.
 
 ## 5. Geometry
 
-All geometry comes from the domain kernel. The generator must not invent numbers. N and the parent patch come from the **adjacent step**, not a global 20×20.
+All geometry comes from the domain kernel. The generator must not invent numbers.
 
 ```text
 Parent layer:
