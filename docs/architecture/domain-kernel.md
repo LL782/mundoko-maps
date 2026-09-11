@@ -22,7 +22,7 @@ Canonical names: prototype `Floor` is **Plan**.
 | Scale | 1mm (feet) | 20cm tile (feet) | 20cm tile (miles, approx.) | What it is |
 | --- | ---: | ---: | ---: | --- |
 | Extra | — | — | — | One chart of extra-planar globes (15 × 15) |
-| Global | 210,000 | 42,000,000 | 7,955 | One planet (Earth-diameter square) |
+| Global | 200,000 | 40,000,000 | 7,580 | One planet (~Earth diameter; 20 × 20 States) |
 | State | 10,000 | 2,000,000 | 380 | |
 | City | 500 | 100,000 | 19 | |
 | Town | 100 | 20,000 | 4 | |
@@ -34,26 +34,20 @@ Checks that must hold in tests (Global–Plan):
 
 - `tileFeet === mmFeet * 200` (because 20cm = 200mm).
 - City’s “19 miles” quirk: `100_000 / 5280 ≈ 18.94`, which the sheet rounds to 19. **Store 100,000 feet**, never 19 miles.
-- Global: `21 * 2_000_000 === 42_000_000`.
+- Global: `20 * 2_000_000 === 40_000_000`.
 - Extra has no geographic feet. Each cell *is* a Global (a whole globe).
 
 ### 2.1 Global → State, from Earth
 
-A Global tile is a 20cm square standing for **one planet**. Take Earth’s mean diameter (7,917.5 miles) and ask how many State tiles (2,000,000 ft ≈ 378.8 miles; sheet says 380) fit along that edge:
+A Global tile is a 20cm square standing for **one planet**. Earth’s mean diameter is 7,917.5 miles; a State tile is 2,000,000 ft ≈ 378.8 miles (sheet: 380). Twenty States along the edge is **7,576 miles** (~4% under Earth). That is close enough for the sheet’s approximate miles, and it matches the paper grid: each State is **1cm** on the Global tile (same patch as City-on-State).
 
-`7,917.5 / (2_000_000 / 5280) ≈ 20.90` → **N = 21**.
+**N = 20.** 1mm on the Global sheet is 200,000 ft ≈ **38 miles**.
 
-| | Miles |
-| --- | ---: |
-| Earth diameter | 7,917.5 |
-| 21 × State tile | 7,954.5 |
-| Error | +0.5% |
+Even width means no single centre State (the four central States meet in the middle). Extra still has the odd centre at the plane chart.
 
-21 is odd, so the planet has a **centre State**. 1mm on the Global sheet is 210,000 ft ≈ **40 miles**. Each State is ≈9.5mm on that sheet — still drawable, in the same family as the 1cm City-on-State patch.
+**Not chosen:** N = 21 (0.5% over Earth’s diameter, odd centre, 9.5mm cells). **Not chosen:** N ≈ 66 from Earth’s equator — 3mm State cells and a 4,356-tile mosaic.
 
-**Not chosen:** N = 20 (even, no centre, 4% short of Earth’s diameter). **Not chosen:** N ≈ 66 from Earth’s equator (24,901 miles) — 3mm State cells and a 4,356-tile mosaic, which fights “comfortably draw on millimetre paper.”
-
-A planet’s geography wraps inside that 21 × 21 State square (same torus wrap as the prototype, extent updated): **42,000,000 feet** on an edge, not 100,000,000.
+A planet’s geography wraps inside that 20 × 20 State square: **40,000,000 feet** on an edge (prototype was 100,000,000 / 50 States).
 
 ### 2.2 Extra → Global, extra-planar
 
@@ -78,19 +72,19 @@ A child tile occupies a square patch of its parent. On paper: “X cm on the par
 | Parent → child | Patch on parent | Linear divisor N | Children per parent | Notes |
 | --- | --- | ---: | ---: | --- |
 | Extra → Global | 20/15 cm ≈ 13.3mm | 15 | **15 × 15 = 225** | Planes, not geography |
-| Global → State | 20/21 cm ≈ 9.5mm | 21 | **21 × 21 = 441** | One planet; wraps |
+| Global → State | 1cm | 20 | **20 × 20 = 400** | One planet; wraps |
 | State → City | 1cm | 20 | **20 × 20 = 400** | |
 | City → Town | 4cm | 5 | **5 × 5 = 25** | |
 | Town → Hood | 10cm | 2 | **2 × 2 = 4** | |
 | Hood → Block | 2cm | 10 | **10 × 10 = 100** | |
 | Block → Plan | 4cm | 5 | **5 × 5 = 25** | |
 
-Do not hard-code 20, 5%, or 400 outside this table. Worst-case mosaic is Global→State (**441**), then State→City (400), then Extra→Global (225).
+Do not hard-code 20, 5%, or 400 outside this table. Worst-case mosaic is **400** (Global→State and State→City), then Extra→Global (225).
 
 ```mermaid
 flowchart LR
     Extra -->|"15 × 15 planes"| Global
-    Global -->|"21 × 21"| State
+    Global -->|"20 × 20"| State
     State -->|"20 × 20"| City
     City -->|"5 × 5"| Town
     Town -->|"2 × 2"| Hood
@@ -121,10 +115,10 @@ Rules:
 
 - Extra: a singleton. `east` / `south` unused. Its 225 children are `Global` tiles with `plane = {east: col, south: row}`.
 - Global: one tile per plane. `east` / `south` are 0 (the planet origin). Neighbours at Global scale are other planes — that is Extra, so **no N/S/E/W at Global**; scale up instead.
-- State–Plan: `east` / `south` in feet, snapped to that scale’s origin, wrapping in `[0, 42_000_000)`.
+- State–Plan: `east` / `south` in feet, snapped to that scale’s origin, wrapping in `[0, 40_000_000)`.
 - Default / “start here” plane: **`{ east: 7, south: 7 }`**, the centre of the Extra chart.
 
-`parentTile` of a State uses that State’s `plane` to find the one Global. `childTiles` of Extra are 225 Globals (most missing). `childTiles` of a Global are 441 State origins on that plane.
+`parentTile` of a State uses that State’s `plane` to find the one Global. `childTiles` of Extra are 225 Globals (most missing). `childTiles` of a Global are 400 State origins on that plane.
 
 ## 5. Kernel API
 
@@ -136,13 +130,13 @@ type Scale =
 type Step = {
   parent: Scale
   child: Scale
-  linearDivisor: 2 | 5 | 10 | 15 | 20 | 21
-  parentPatchCm: number // 20 / N; Extra and Global are not whole centimetres
+  linearDivisor: 2 | 5 | 10 | 15 | 20
+  parentPatchCm: number // 20 / N; Extra is 20/15 cm, others are whole millimetres or centimetres
 }
 
 tileFeet(scale: Scale): number | null  // null at Extra
 mmFeet(scale: Scale): number | null
-worldFeet(): 42_000_000
+worldFeet(): 40_000_000
 centrePlane(): PlaneId                 // {7, 7}
 steps(): Step[]
 stepDown(scale: Scale): Step | null    // Plan → null
@@ -160,7 +154,7 @@ cropRectInParent(id: TileId): {
 } | null
 ```
 
-Wrap feet with `modulo 42_000_000` for State–Plan. Do not wrap Extra cells.
+Wrap feet with `modulo 40_000_000` for State–Plan. Do not wrap Extra cells.
 
 ## 6. What this changes downstream
 
@@ -168,8 +162,8 @@ Wrap feet with `modulo 42_000_000` for State–Plan. Do not wrap Extra cells.
 | --- | --- |
 | Tile Store | `TileId` includes `plane`. `getParent` / `listChildren` as before. Extra is at most one row. |
 | Map Viewer | Scale up from Global opens Extra (highlight that plane’s cell). Scale down from Extra enters that cell’s Global. No N/S/E/W on Extra or Global. Default plane is the centre. |
-| Guide Generator | Mosaic N × N for the step below. Canvas **2520px** (20cm at 320dpi) so every N including 15 and 21 divides evenly (`2520 / N`). Batch when N ≥ 10 (Hood→Block 100, Extra 225, State→City 400, Global→State 441). |
-| Tests | One golden case per ladder step. Extra: cell `(7,7)` is the centre plane. Global: 21 State origins wrap. |
+| Guide Generator | Mosaic N × N for the step below. Canvas **2400px** (20cm at ~300dpi); every N (2, 5, 10, 15, 20) divides evenly. Batch when N ≥ 10 (Hood→Block 100, Extra 225, Global→State and State→City 400). |
+| Tests | One golden case per ladder step. Extra: cell `(7,7)` is the centre plane. Global: 20 State origins wrap. |
 
 ## 7. Still open (does not change nestings)
 
