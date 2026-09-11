@@ -2,7 +2,7 @@
 
 Not a container. A pure TypeScript library every container imports. If this is wrong, guides mis-register and explorers see the wrong square.
 
-Source of truth for **how scales nest** is the 2022 sheet [Map scales, tiles and grids](https://pathfindertools.business.blog/2022/09/21/map-scales-and-grid-squares/), transcribed below. The earlier architecture draft assumed every parent was a **20 × 20** child grid (400 children). That is only true for some scale pairs.
+Source of truth for **feet per scale** is the 2022 sheet [Map scales, tiles and grids](https://pathfindertools.business.blog/2022/09/21/map-scales-and-grid-squares/), transcribed below. Child-grid size is **not** a global 20 × 20: N changes at each step of the ladder. The sheet also lists skip-level pairs (City↔Hood, Town↔Block); **the product ignores those** and only uses the step immediately above or below.
 
 <img alt="Handwritten map scales and grid squares sheet: feet per millimetre and per 20cm tile, plus how each scale pair nests" src="./images/map-scales-and-grid-squares.jpg" width="480" />
 
@@ -35,69 +35,49 @@ Checks that must hold in tests:
 
 The prototype’s 100,000,000-foot world is consistent with this table: `100_000_000 / 2_000_000 = 50` State tiles along an edge.
 
-## 3. Nesting is a graph, not a 20×20 ladder
+## 3. Nesting is a ladder (N changes each step)
 
-A child tile occupies a **square patch** of a parent tile. The patch size depends on the **scale pair**, not on a global constant.
-
-On paper: “X cm on the parent ↔ 20cm child tile”. In code: linear divisor `N = 20 / X`, so one parent holds an **N × N** grid of that child (N² children).
-
-| Parent ↔ child | Patch on parent | Linear divisor N | Children per parent | Child tile (feet) |
-| --- | --- | ---: | ---: | ---: |
-| State ↔ City | 1cm | 20 | **20 × 20 = 400** | 100,000 |
-| City ↔ Town | 4cm | 5 | **5 × 5 = 25** | 20,000 |
-| City ↔ Hood | 2cm | 10 | **10 × 10 = 100** | 10,000 |
-| Town ↔ Hood | 10cm | 2 | **2 × 2 = 4** | 10,000 |
-| Town ↔ Block | 1cm | 20 | **20 × 20 = 400** | 1,000 |
-| Hood ↔ Block | 2cm | 10 | **10 × 10 = 100** | 1,000 |
-| Block ↔ Plan | 4cm | 5 | **5 × 5 = 25** | 200 |
-
-Only State→City and Town→Block are 400-child windows. Town→Hood is four children. Do not hard-code 20, 5%, or 400 anywhere outside this table.
-
-It is also **not a single zoom stack**. A scale can have more than one parent and more than one child:
+Order is fixed:
 
 ```text
-State
-  └── City          (20 × 20)
-        ├── Town    (5 × 5)
-        │     ├── Hood   (2 × 2)
-        │     │     └── Block  (10 × 10)
-        │     │           └── Plan  (5 × 5)
-        │     └── Block  (20 × 20)
-        │           └── Plan  (5 × 5)
-        └── Hood    (10 × 10)
-              └── Block  (10 × 10)
-                    └── Plan  (5 × 5)
+State → City → Town → Hood → Block → Plan
 ```
+
+Each scale has **at most one parent** and **at most one child**. Scale up / scale down / guide overlays never ask the artist to pick a branch.
+
+A child tile occupies a square patch of its parent. On paper: “X cm on the parent ↔ 20cm child tile”. In code: linear divisor `N = 20 / X`, so one parent holds an **N × N** grid of the child immediately below (N² children).
+
+| Parent → child | Patch on parent | Linear divisor N | Children per parent | Child tile (feet) |
+| --- | --- | ---: | ---: | ---: |
+| State → City | 1cm | 20 | **20 × 20 = 400** | 100,000 |
+| City → Town | 4cm | 5 | **5 × 5 = 25** | 20,000 |
+| Town → Hood | 10cm | 2 | **2 × 2 = 4** | 10,000 |
+| Hood → Block | 2cm | 10 | **10 × 10 = 100** | 1,000 |
+| Block → Plan | 4cm | 5 | **5 × 5 = 25** | 200 |
+
+Only State→City is a 400-child window. Town→Hood is four children. Do not hard-code 20, 5%, or 400 outside this table.
 
 ```mermaid
-flowchart TD
-    State --> City
-    City --> Town
-    City --> Hood
-    Town --> Hood
-    Town --> Block
-    Hood --> Block
-    Block --> Plan
+flowchart LR
+    State -->|"20 × 20"| City
+    City -->|"5 × 5"| Town
+    Town -->|"2 × 2"| Hood
+    Hood -->|"10 × 10"| Block
+    Block -->|"5 × 5"| Plan
 ```
 
-Consequences:
+Invariant for every step: `parentTileFeet / N === childTileFeet`.
 
-- `parentOf(tile)` is meaningless without a **parent scale**. Hood sits inside both a Town (half the parent) and a City (one tenth).
-- `childrenOf(tile)` is meaningless without a **child scale**. A City tile contains 25 Towns *and* 100 Hoods.
-- Guide overlays and viewer “scale up / scale down” must pick a **scale pair** (or show a chooser when more than one pair applies).
-
-Invariant for every pair: `parentTileFeet / N === childTileFeet`.
+**Ignored from the sheet:** City↔Hood (10 × 10) and Town↔Block (20 × 20). Those nest geometrically, but skipping Town or Hood would fork navigation and guides. If we ever need a skip, compose two adjacent steps; do not add extra kernel edges.
 
 ## 4. Kernel API
-
-Suggested shape — names can move; the pair-wise nature cannot.
 
 ```ts
 type Scale = 'State' | 'City' | 'Town' | 'Hood' | 'Block' | 'Plan'
 
 type TileId = { scale: Scale; east: number; south: number }
 
-type ScalePair = {
+type Step = {
   parent: Scale
   child: Scale
   parentPatchCm: 1 | 2 | 4 | 10
@@ -106,32 +86,31 @@ type ScalePair = {
 
 tileFeet(scale: Scale): number
 mmFeet(scale: Scale): number
-nestings(): ScalePair[]
-pairing(parent: Scale, child: Scale): ScalePair | null
-parentsOf(scale: Scale): Scale[]
-childrenOfScale(scale: Scale): Scale[]
+steps(): Step[]                 // the five rows above, in order
+stepDown(scale: Scale): Step | null  // Plan → null
+stepUp(scale: Scale): Step | null    // State → null
 
 originOf(pointFeet: { east: number; south: number }, scale: Scale): TileId
 neighbour(id: TileId, dir: 'N' | 'S' | 'E' | 'W'): TileId
 
-parentTile(id: TileId, parentScale: Scale): TileId
-childTiles(id: TileId, childScale: Scale): TileId[] // length N²
-childIndex(id: TileId, parentScale: Scale): { col: number; row: number }
-cropRectInParent(id: TileId, parentScale: Scale): {
+parentTile(id: TileId): TileId | null     // unique, or null at State
+childTiles(id: TileId): TileId[]          // N² ids, or [] at Plan
+childIndex(id: TileId): { col: number; row: number } | null
+cropRectInParent(id: TileId): {
   xCm: number; yCm: number; sizeCm: number
-}
+} | null
 ```
 
-`childTiles` / `cropRectInParent` throw (or return `null`) if the two scales are not a row in the nesting table. No inferred “skip a generation” math: City→Block is Town→Block or Hood→Block, never a made-up 100×100.
+No `parentScale` / `childScale` arguments. Adjacent is implied.
 
 ## 5. What this changes downstream
 
 | Consumer | Implication |
 | --- | --- |
-| Tile Store | `listChildren(id, childScale)`, `listParents(id)` (0–2 rows). Coverage windows are independent of N. |
-| Map Viewer | “Scale up/down” offers every valid pair. City down: Town *or* Hood. Hood up: Town *or* City. |
-| Guide Generator | Mosaic is **N × N for a chosen child scale**, not always 20×20. Parent crop uses that pair’s patch (1, 2, 4, or 10cm). 2400px canvas still divides evenly by 2, 5, 10, and 20. Worst-case stitch is still 400 tiles (State→City, Town→Block); batch only those. |
-| Tests | One golden case per row in the nesting table (N, feet, crop rect). Off-by-one here is a product bug. |
+| Tile Store | `getParent(id)`, `listChildren(id)` (0–N² existing rows). Coverage windows are independent of N. |
+| Map Viewer | Scale up = `parentTile`. Scale down = the child cell under the last click, or the centre child. No chooser. |
+| Guide Generator | One parent crop + one child mosaic. Mosaic is **N × N for the step below**, not always 20×20. 2400px canvas divides evenly by every N. Batch only when N is 10 or 20 (Hood→Block, State→City). |
+| Tests | One golden case per ladder step (N, feet, crop rect). Off-by-one here is a product bug. |
 
 ## 6. Still open (does not change nestings)
 

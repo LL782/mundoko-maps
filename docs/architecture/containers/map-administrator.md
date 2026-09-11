@@ -66,7 +66,7 @@ The tile work page is the hub:
 
 This is the CMS. Spend design time here.
 
-- A grid of cells for the current window (size is a UI choice — e.g. one parent’s children at that pair’s N, or a 10×10 atlas). Do not assume every scale is 20×20.
+- A grid of cells for the current window (size is a UI choice — e.g. one parent’s N × N children, or a 10×10 atlas). Do not assume every scale is 20×20.
 - Cell colour/state: missing / guide only / draft / published.
 - Click → tile work page.
 - Window pans by pages of cells, not by dragging a GIS map.

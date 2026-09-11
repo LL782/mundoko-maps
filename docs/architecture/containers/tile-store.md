@@ -131,8 +131,8 @@ The rest of the app depends on this module, not on SQL.
 getTile(id: TileId): Promise<Tile | null>
 getAsset(id: TileId, kind: AssetKind): Promise<Asset | null>
 listCoverage(scale, window: Bounds): Promise<CoverageCell[]>
-listChildren(id: TileId, childScale: Scale): Promise<Tile[]> // 0–N² existing rows
-listParents(id: TileId): Promise<Tile[]>                     // 0–2; Hood has two parent scales
+listChildren(id: TileId): Promise<Tile[]> // 0–N² existing rows of the step below
+getParent(id: TileId): Promise<Tile | null>
 upsertDraft(id: TileId, fields): Promise<Tile>
 publish(id: TileId): Promise<void>
 unpublish(id: TileId): Promise<void>

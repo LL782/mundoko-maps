@@ -106,7 +106,7 @@ Responsibilities:
 - Scale enum: `State | City | Town | Hood | Block | Plan` (prototype `Floor` is Plan; Extra/Global are unspecified).
 - Tile identity: `(scale, east, south)` with a stable string id. Canonical unit: **feet** (miles on the sheet are approximate).
 - World size and wrapping (prototype uses a 100,000,000-foot world = 50 State tiles on an edge).
-- **Scale-pair nestings**, not a global child grid. A parent holds an N × N window of a given child, and N depends on the pair: 20, 10, 5, or 2 (400, 100, 25, or 4 children). A scale may have more than one parent and more than one child (e.g. City→Town *and* City→Hood). Kernel functions take an explicit parent/child scale.
+- **Adjacent nestings**, not a global child grid. Order is State → City → Town → Hood → Block → Plan. Each step has its own N × N window (20, 5, 2, 10, 5). Skip-level pairs on the 2022 sheet (City↔Hood, Town↔Block) are ignored. `parentTile` / `childTiles` need no scale argument.
 - Physical layout constants: 20cm printable square, millimetre grid semantics, A4 / US Letter print frame.
 - Status model: `missing` (not stored) · `guide` (generated only) · `draft` · `published`.
 
@@ -224,7 +224,7 @@ Ship vertical slices that a human can *see*, not layers that only a future slice
 
 ### Slice 0 — Domain kernel
 
-Pure TypeScript: scales, `TileId`, scale-pair nestings (N × N per pair), wrapping. Vitest. No UI. Golden tests for every row in the [nesting table](./domain-kernel.md).
+Pure TypeScript: scales, `TileId`, adjacent nestings (N × N per step), wrapping. Vitest. No UI. Golden tests for every row in the [nesting table](./domain-kernel.md).
 
 ### Slice 1 — Tile Store + one published tile
 
@@ -244,7 +244,7 @@ Inngest + Sharp: validate, original + web + print derivatives, `draft` row. Prev
 
 ### Slice 5 — Guide Generator
 
-Parent crop + child mosaic for **chosen scale pairs** (N × N from the kernel, not always 20×20) + grid overlay. Download PNG. Cache on R2. Invalidate on publish.
+Parent crop + child mosaic for the **adjacent** scales (N × N from the kernel, not always 20×20) + grid overlay. Download PNG. Cache on R2. Invalidate on publish.
 
 ### Slice 6 — Artist loop polish
 
@@ -287,16 +287,16 @@ Recorded here so future-you does not re-litigate them without new information.
 | ADR-006 | Guides are cached assets, not the source of truth | Accepted |
 | ADR-007 | Single-artist allowlist auth | Accepted |
 | ADR-008 | Extract a second deployable only when serverless time/memory is a measured problem | Accepted |
-| ADR-009 | Nestings are a scale-pair graph (N ∈ 2, 5, 10, 20), not a uniform 20×20 tree | Accepted |
+| ADR-009 | Nestings are an adjacent ladder; N varies by step; skip-level pairs are ignored | Accepted |
 
-Revisit ADR-002 if a second author needs a full editorial workflow *and* we are already paying for engineering time. Revisit ADR-003 if Inngest step limits make 400-tile mosaics awkward (State→City and Town→Block only) — then a tiny Fly.io worker, not AWS.
+Revisit ADR-002 if a second author needs a full editorial workflow *and* we are already paying for engineering time. Revisit ADR-003 if Inngest step limits make the State→City 400-tile mosaic awkward — then a tiny Fly.io worker, not AWS.
 
 ## 15. Glossary
 
 | Term | Meaning |
 | --- | --- |
 | Tile | One 20cm square of the world at one scale, identified by `(scale, east, south)`. |
-| Scale pair | An allowed parent↔child relationship with linear divisor N ∈ {2, 5, 10, 20}. |
+| Scale | One of State, City, Town, Hood, Block, Plan. Adjacent steps only; child grid N depends on the step. |
 | Guide | Printable image that ghosts in parent/child context so the artist can draw the missing square. |
 | Detail | Finished (or draft) artwork for a tile. |
 | Coverage | Which squares at a scale have art, have only a guide, or are missing. |
