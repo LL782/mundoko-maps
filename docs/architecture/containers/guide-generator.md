@@ -45,7 +45,7 @@ Same *process* (Inngest + Sharp), different *function* and events.
 | Piece | Choice | Why |
 | --- | --- | --- |
 | Orchestration | **Inngest** `generate-guide` | Steps = batches of children. |
-| Pixels | **Sharp** `composite()` | Build a 2400×2400 canvas (20cm at ~300dpi). 2400 divides evenly by every N (2, 5, 10, 20). Cell size is `2400 / N`, not a constant 120px. |
+| Pixels | **Sharp** `composite()` | Build a 2400×2400 canvas. Cell size is 2400 / N pixels where N is the height and width in cells for whatever scale we're working with (2, 5, 10, 15, 20). Note: 20cm at 300dpi is 2361 so 2400, which divides evenly by every N, will provide a high resolution print. |
 | Grid | SVG string → Sharp, or draw via a tiny overlay PNG generated once per scale | Vector grid stays crisp. |
 | Output | PNG for drawing (no WebP: some printers and photo labs are fussy) | Optional PDF in Slice 6 via the browser print path first. |
 | Cache | R2 + `assets` row | Do not recompute if not stale. |
