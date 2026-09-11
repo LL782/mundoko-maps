@@ -14,7 +14,7 @@ Updated C4 views (custom CMS, Inngest + Sharp, explorers go through the app):
 ## How to read this
 
 1. [System design](./01-system.md) — context, containers, tech choices, cost, and build order.
-2. [Domain kernel](./domain-kernel.md) — scales, feet, and the adjacent nesting ladder.
+2. [Domain kernel](./domain-kernel.md) — scales, feet, donut-ring wrap, and the adjacent nesting ladder.
 3. Then the five containers, in dependency order:
    1. [Tile Store](./containers/tile-store.md) — custom CMS, source of truth.
    2. [Map Viewer](./containers/map-viewer.md) — public explorer site.
