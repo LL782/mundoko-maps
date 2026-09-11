@@ -89,15 +89,15 @@ Rules:
 - Empty grid: SVG overlay matching the millimetre semantics of that scale (domain kernel), not a bitmap if we can avoid it.
 - Published art sits under the margin ticks, not covering them.
 
-The current prototype’s “generated tile” (parent ghost + 400 children) is **Guide Generator output**, not default explorer chrome. Explorers should see clean published art. A later “workshop” toggle may show construction overlays; keep it out of v1.
+The current prototype’s “generated tile” (parent ghost + a child mosaic) is **Guide Generator output**, not default explorer chrome. That mosaic is N × N for the step below, not always 400 cells. Explorers should see clean published art. A later “workshop” toggle may show construction overlays; keep it out of v1.
 
 ## 6. Navigation
 
 | Action | Result |
 | --- | --- |
 | N / S / E / W | Adjacent `TileId` at the same scale (kernel `neighbour`) |
-| Scale up | Parent tile, same world point |
-| Scale down | Child that contains the point last clicked, or the centre child |
+| Scale up | Parent tile, same world point (no-op at State) |
+| Scale down | Child that contains the last click, or the centre child (no-op at Plan) |
 | “Start here” | Seeded published tile |
 | Keyboard | Arrow keys for neighbours; optional |
 

@@ -53,6 +53,7 @@ None of this has been built yet. It's still in the early days of ideation.
 The greenfield design (tech choices, cost, and a build order for a solo / shoestring project) lives in [`docs/architecture/`](./docs/architecture/README.md):
 
 - [System design](./docs/architecture/01-system.md)
+- [Domain kernel](./docs/architecture/domain-kernel.md) (scales and nestings)
 - [Tile Store](./docs/architecture/containers/tile-store.md) (custom CMS — not Contentful)
 - [Map Viewer](./docs/architecture/containers/map-viewer.md)
 - [Map Administrator](./docs/architecture/containers/map-administrator.md)

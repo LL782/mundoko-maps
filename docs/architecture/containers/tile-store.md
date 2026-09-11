@@ -68,7 +68,7 @@ Minimal schema for Slices 1–6. Types are indicative.
 ```text
 tiles
   id              uuid pk
-  scale           text not null   -- Extra…Floor
+  scale           text not null   -- State | City | Town | Hood | Block | Plan
   east            bigint not null
   south           bigint not null
   status          text not null   -- draft | published
@@ -131,7 +131,7 @@ The rest of the app depends on this module, not on SQL.
 getTile(id: TileId): Promise<Tile | null>
 getAsset(id: TileId, kind: AssetKind): Promise<Asset | null>
 listCoverage(scale, window: Bounds): Promise<CoverageCell[]>
-listChildren(id: TileId): Promise<Tile[]>      // 0–400 existing rows
+listChildren(id: TileId): Promise<Tile[]> // 0–N² existing rows of the step below
 getParent(id: TileId): Promise<Tile | null>
 upsertDraft(id: TileId, fields): Promise<Tile>
 publish(id: TileId): Promise<void>

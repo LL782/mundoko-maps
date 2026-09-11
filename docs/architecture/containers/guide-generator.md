@@ -7,7 +7,7 @@
 
 ## 1. Purpose
 
-Make **drawing guides** for a target square: a printable 20cm image that shows the artist what already exists at the **scale above** (parent crop, zoomed in) and/or the **scale below** (mosaic of child tiles), plus the grid they must draw on.
+Make **drawing guides** for a target square: a printable 20cm image that shows the artist what already exists on the scale **immediately above** (parent crop) and **immediately below** (child mosaic, N × N for that step), plus the grid they must draw on.
 
 The vision text said “large scale guides from small scale tiles” (the mosaic / zoom-out direction). The artist also needs the other direction: a faint blow-up of the parent so they can line up coastlines and roads when *adding detail*. Do both, as layers, matching the prototype’s generated-tile sketch.
 
@@ -15,11 +15,11 @@ Guides are a **cache**, not source of truth. Art lives on tile `web`/`original` 
 
 ## 2. Responsibilities
 
-- Given a `TileId`, load parent art (if any) and existing children (0–400).
+- Given a `TileId`, load the unique parent (if any) and the N² children of the step below (0–N² existing; N is 20, 5, 2, or 10).
 - Composite a square PNG:
   1. White (or paper) background.
   2. Parent layer: the region of the parent that corresponds to this tile, scaled to 20cm, low opacity.
-  3. Children layer: 20×20 mosaic of whatever child **web** (or draft) images exist, low opacity; empty cells stay transparent.
+  3. Children layer: an **N × N** mosaic of whatever child **web** (or draft) images exist, low opacity; empty cells stay transparent.
   4. Grid overlay (mm semantics for this scale) as SVG rasterised or drawn in Sharp.
   5. Optional crop/registration marks in the print margin — if we export a full A4/Letter PDF later; the core asset is the 20cm square.
 - Store as `assets.kind = guide`.
@@ -45,16 +45,16 @@ Same *process* (Inngest + Sharp), different *function* and events.
 | Piece | Choice | Why |
 | --- | --- | --- |
 | Orchestration | **Inngest** `generate-guide` | Steps = batches of children. |
-| Pixels | **Sharp** `composite()` | Build a 2400×2400 (or 2000×2000) canvas; 20cm at 300dpi is 2362px — use **2400** for clean 20×20 cells (120px each). |
+| Pixels | **Sharp** `composite()` | Build a 2400×2400 canvas. Cell size is 2400 / N pixels where N is the height and width in cells for whatever scale we're working with (2, 5, 10, 15, 20). Note: 20cm at 300dpi is 2361 so 2400, which divides evenly by every N, will provide a high resolution print. |
 | Grid | SVG string → Sharp, or draw via a tiny overlay PNG generated once per scale | Vector grid stays crisp. |
 | Output | PNG for drawing (no WebP: some printers and photo labs are fussy) | Optional PDF in Slice 6 via the browser print path first. |
 | Cache | R2 + `assets` row | Do not recompute if not stale. |
 
 ### Rejected
 
-- HTML/CSS “overflow hidden” print of 400 `<img>` tags as the *only* generator: useful as an experiment (the old notes considered it), bad as a source of truth (browser-dependent). A deterministic Sharp pipeline can be tested with fixtures.
+- HTML/CSS “overflow hidden” print of N² `<img>` tags as the *only* generator: useful as an experiment (the old notes considered it), bad as a source of truth (browser-dependent). A deterministic Sharp pipeline can be tested with fixtures.
 - GPU / GIS raster tools.
-- Doing this in the browser: 400 downloads on the artist’s laptop, no cache sharing, no idempotency.
+- Doing this in the browser: up to 400 downloads on the artist’s laptop, no cache sharing, no idempotency.
 
 ## 5. Geometry
 
@@ -65,14 +65,17 @@ Parent layer:
   parentImage  → crop rectangle for this child slot → scale to CANVAS
 
 Child mosaic:
-  for each of 20×20 slots:
+  N = stepDown(tile.scale).linearDivisor   // 20 | 5 | 2 | 10
+  CELL = CANVAS / N
+  for each of N×N slots:
     if child has web/draft image: scale to CELL × CELL, place at (i * CELL, j * CELL)
 
 Canvas:
   CANVAS = 2400 px
-  CELL   = 120 px
-  20 × 120 = 2400
+  CELL   = 2400 / N     // 120, 480, 1200, or 240
 ```
+
+A City guide overlays its State parent and a 5×5 of Town children — not Hood.
 
 Opacity: start at **0.35** parent, **0.45** children (children are the detail the artist is consolidating or extending). Adjust after the first real print; store as constants, not UI sliders, in v1.
 
@@ -85,21 +88,19 @@ Layer order (bottom to top): background → parent → children → grid → (la
 ```text
 guide/requested
     │
-    ├─ step: resolve parent id + 400 child ids (kernel, no IO)
-    ├─ step: fetch tile rows for parent + children (one SQL)
-    ├─ step: composite parent layer to canvas (1 image) → write R2 temp
-    ├─ step: mosaic children rows 0–4   (80 images) → temp
-    ├─ step: mosaic rows 5–9
-    ├─ step: mosaic rows 10–14
-    ├─ step: mosaic rows 15–19
+    ├─ step: resolve parent id + N² child ids (kernel, no IO)
+    ├─ step: fetch tile rows for those ids (one SQL)
+    ├─ step: composite parent layer → write R2 temp
+    ├─ step: mosaic children in row batches when N is 10 or 20
+    │         (N = 2 or 5 fits in one step)
     ├─ step: overlay grid, encode PNG, put guides/{tileId}/{sha}.png
     ├─ step: upsert asset, clear stale flag, job succeeded
     └─ temps may be left; overwrite next run
 ```
 
-If a batch still times out, cut to 2 rows (40 images). Prefer downloading **web** derivatives (already ~2k px) not originals.
+If a batch still times out, cut to fewer rows. Prefer downloading **web** derivatives (already ~2k px) not originals.
 
-Memory: do not hold 400 decoded bitmaps. Composite each cell onto the canvas and discard.
+Memory: do not hold N² decoded bitmaps. Composite each cell onto the canvas and discard.
 
 ## 7. Event contract
 
@@ -125,7 +126,7 @@ v1 invalidation: set `guides_stale = true` on:
 - its parent (mosaic changed),
 - all children (parent crop changed) — can be a lot; **only mark the parent and the tile itself** if child fan-out is expensive. Artist can always click Download (force).
 
-Do not eagerly regenerate 400 guides on every publish. Regeneration is pull-based (artist asked) plus optional “regenerate if stale and they open the tile page.”
+Do not eagerly regenerate every related guide on each publish. Regeneration is pull-based (artist asked) plus optional “regenerate if stale and they open the tile page.” Worst-case fan-out is 400 children (State→City).
 
 ## 8. Download artefact
 
@@ -154,12 +155,12 @@ Do not wait for production tiles to discover off-by-one cell placement.
 
 Slice 5 deliverable:
 
-- Kernel functions: `parentOf`, `childrenOf` (400 ids), `cropRectInParent`.
+- Kernel functions: `parentTile`, `childTiles` (N² ids), `cropRectInParent` — one test per ladder step.
 - Inngest `generate-guide` with at least parent crop + empty mosaic + grid.
-- Then add batched children.
+- Then add batched children for N = 10 and N = 20.
 - Admin button wired to job + download.
 
-Done when the artist can download a guide for a missing City square that ghosts in the State parent (if present) and any Town/Hood children, print it, and have features line up at the edges with a neighbouring guide (physical test, two tiles).
+Done when the artist can download a guide for a missing City square that ghosts in the State parent (if present) and any Town children, print it, and have features line up at the edges with a neighbouring guide (physical test, two tiles).
 
 ## 11. Risks
 
@@ -169,7 +170,7 @@ Done when the artist can download a guide for a missing City square that ghosts 
 | Serverless timeout | Batches; web derivatives only; Fly.io escape hatch (ADR-008). |
 | Regenerating the world on each upload | Stale flags, pull-based generate. |
 | Using guides as explorer art | Viewer ignores `kind=guide` for public image. |
-| 400 R2 GETs cost / latency | Parallelism cap (e.g. 8 at a time) inside a step; still cheap on R2. |
+| 400 R2 GETs cost / latency | Only State→City (N = 20). Parallelism cap (e.g. 8 at a time); still cheap on R2. |
 
 ## 12. Relationship to the old “map slice” notes
 
