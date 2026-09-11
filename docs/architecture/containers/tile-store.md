@@ -14,9 +14,9 @@ This is not a general CMS. No page builder, no rich-text blog, no content-model 
 
 ## 2. Responsibilities
 
-- Persist tile records keyed by `(scale, east, south)`.
+- Persist tile records keyed by `(plane, scale, east, south)`.
 - Persist assets (original, web, print, guide) in object storage.
-- Enforce uniqueness: at most one *current* tile per coordinate per scale.
+- Enforce uniqueness: at most one *current* tile per plane + coordinate + scale.
 - Answer coverage queries for a bounding window.
 - Resolve parent and children via the domain kernel, then fetch whatever records exist.
 - Publish / unpublish (draft vs public).
@@ -33,7 +33,7 @@ Out of scope:
 
 | Need | Generic CMS | This store |
 | --- | --- | --- |
-| Identity | Entry id, slugs | `(scale, east, south)` |
+| Identity | Entry id, slugs | `(plane, scale, east, south)` |
 | “Missing” | Empty entries you must create | Absence of a row |
 | Hierarchy | Reference fields, easy to get wrong | Deterministic parent/child math |
 | Delivery | CDN for a few hero images | Thousands of small tiles, hashed, cache-forever |
@@ -46,7 +46,7 @@ Payload/Directus are closer (you own the DB) but you still fight their admin and
 
 | Piece | Choice | Notes |
 | --- | --- | --- |
-| Metadata | **Postgres** on **Neon** | `UNIQUE (scale, east, south)`. Window queries with indexes on `(scale, east, south)`. |
+| Metadata | **Postgres** on **Neon** | `UNIQUE (plane_east, plane_south, scale, east, south)`. |
 | Access | **Drizzle ORM** + SQL migrations | Keep tile queries obvious. |
 | Blobs | **Cloudflare R2** | S3-compatible. Zero egress — essential for a public map. |
 | Public delivery | R2 custom domain via Cloudflare | `https://tiles.mundoko.world/{hash}.webp` |
@@ -68,16 +68,18 @@ Minimal schema for Slices 1–6. Types are indicative.
 ```text
 tiles
   id              uuid pk
-  scale           text not null   -- State | City | Town | Hood | Block | Plan
-  east            bigint not null
-  south           bigint not null
+  scale           text not null   -- Extra | Global | State | City | Town | Hood | Block | Plan
+  plane_east      int not null    -- 0..14; Extra row uses 0,0
+  plane_south     int not null
+  east            bigint not null -- feet; 0 at Extra and Global
+  south           bigint not null -- feet; 0 at Extra and Global
   status          text not null   -- draft | published
   title           text
   notes           text            -- artist-only
   published_at    timestamptz
   created_at      timestamptz
   updated_at      timestamptz
-  unique (scale, east, south)
+  unique (plane_east, plane_south, scale, east, south)
 
 assets
   id              uuid pk
@@ -177,7 +179,7 @@ Expected v1 size: tens to thousands of rows, not millions of *stored* tiles. Pos
 Index:
 
 ```sql
-create unique index tiles_coord on tiles (scale, east, south);
+create unique index tiles_coord on tiles (plane_east, plane_south, scale, east, south);
 create index tiles_scale_status on tiles (scale, status);
 create index assets_tile_kind on assets (tile_id, kind);
 ```
@@ -217,4 +219,4 @@ Done when the Map Viewer can render that seeded tile from the store rather than 
 | Accidental public originals | Separate bucket or prefix; never put `originals/` on the public hostname. |
 | Orphan R2 objects | Accept orphans in v1; a weekly “keys not in `assets`” script later. |
 | Neon cold starts | Viewer should not query on every tile image; images are on R2. HTML can be cached. |
-| Coordinate uniqueness bugs | Unique index; domain kernel is the only writer of `(east, south)` at a scale. |
+| Coordinate uniqueness bugs | Unique index; domain kernel is the only writer of `(plane, east, south)` at a scale. |

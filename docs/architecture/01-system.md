@@ -103,10 +103,10 @@ Not a container. A library every container imports. If this is wrong, guides mis
 
 Responsibilities:
 
-- Scale enum: `State | City | Town | Hood | Block | Plan` (prototype `Floor` is Plan; Extra/Global are unspecified).
-- Tile identity: `(scale, east, south)` with a stable string id. Canonical unit: **feet** (miles on the sheet are approximate).
-- World size and wrapping (prototype uses a 100,000,000-foot world = 50 State tiles on an edge).
-- **Adjacent nestings**, not a global child grid. Order is State → City → Town → Hood → Block → Plan. Each step has its own N × N window (20, 5, 2, 10, 5). Skip-level pairs on the 2022 sheet (City↔Hood, Town↔Block) are ignored. `parentTile` / `childTiles` need no scale argument.
+- Scale enum: `Extra | Global | State | City | Town | Hood | Block | Plan` (prototype `Floor` is Plan).
+- Tile identity: `(plane, scale, east, south)`. Canonical unit: **feet** (miles on the sheet are approximate). Extra indexes planes; it has no geographic feet.
+- World size and wrapping: **42,000,000 feet** per plane (21 State tiles, Earth-diameter Global). Extra is a finite 15 × 15 of planes and does not wrap.
+- **Adjacent nestings.** Order is Extra → Global → State → City → Town → Hood → Block → Plan. N per step: 15, 21, 20, 5, 2, 10, 5. Skip-level pairs on the 2022 sheet are ignored. Extra is extra-planar (versions of the same globe), not a solar system.
 - Physical layout constants: 20cm printable square, millimetre grid semantics, A4 / US Letter print frame.
 - Status model: `missing` (not stored) · `guide` (generated only) · `draft` · `published`.
 
@@ -224,7 +224,7 @@ Ship vertical slices that a human can *see*, not layers that only a future slice
 
 ### Slice 0 — Domain kernel
 
-Pure TypeScript: scales, `TileId`, adjacent nestings (N × N per step), wrapping. Vitest. No UI. Golden tests for every row in the [nesting table](./domain-kernel.md).
+Pure TypeScript: scales, planes, `TileId`, adjacent nestings (N × N per step), 42e6-ft wrap. Vitest. No UI. Golden tests for every row in the [nesting table](./domain-kernel.md).
 
 ### Slice 1 — Tile Store + one published tile
 
@@ -288,15 +288,17 @@ Recorded here so future-you does not re-litigate them without new information.
 | ADR-007 | Single-artist allowlist auth | Accepted |
 | ADR-008 | Extract a second deployable only when serverless time/memory is a measured problem | Accepted |
 | ADR-009 | Nestings are an adjacent ladder; N varies by step; skip-level pairs are ignored | Accepted |
+| ADR-010 | Extra is a 15×15 extra-planar chart of globes; Global is 21×21 States (Earth diameter) | Accepted |
 
-Revisit ADR-002 if a second author needs a full editorial workflow *and* we are already paying for engineering time. Revisit ADR-003 if Inngest step limits make the State→City 400-tile mosaic awkward — then a tiny Fly.io worker, not AWS.
+Revisit ADR-002 if a second author needs a full editorial workflow *and* we are already paying for engineering time. Revisit ADR-003 if Inngest step limits make the Global→State 441-tile mosaic awkward — then a tiny Fly.io worker, not AWS.
 
 ## 15. Glossary
 
 | Term | Meaning |
 | --- | --- |
-| Tile | One 20cm square of the world at one scale, identified by `(scale, east, south)`. |
-| Scale | One of State, City, Town, Hood, Block, Plan. Adjacent steps only; child grid N depends on the step. |
+| Tile | One 20cm square, identified by `(plane, scale, east, south)`. |
+| Scale | Extra, Global, State, City, Town, Hood, Block, Plan. Adjacent steps only; child grid N depends on the step. |
+| Plane | One version of the globe. Indexed by Extra’s 15×15; centre `{7,7}` is home. |
 | Guide | Printable image that ghosts in parent/child context so the artist can draw the missing square. |
 | Detail | Finished (or draft) artwork for a tile. |
 | Coverage | Which squares at a scale have art, have only a guide, or are missing. |
@@ -306,10 +308,9 @@ Revisit ADR-002 if a second author needs a full editorial workflow *and* we are 
 
 ## 16. Open domain questions (do not block the stack)
 
-Feet-per-scale and child-grid sizes are **closed** — see [domain-kernel.md](./domain-kernel.md). Still open:
+Feet-per-scale, Extra/Global, and child-grid sizes are **closed** — see [domain-kernel.md](./domain-kernel.md). Still open:
 
-- Canonical encoding of `east` / `south` in URLs (the prototype uses truncated fractional paths).
+- Canonical encoding of `plane`, `east`, and `south` in URLs (the prototype uses truncated fractional paths).
 - How scanned art is registered to the 20cm square (crop marks vs “artist already cropped”).
-- Whether Extra / Global scales exist above State.
 
 The software containers above do not change when those answers land; only the kernel functions and a few overlay SVGs do.
