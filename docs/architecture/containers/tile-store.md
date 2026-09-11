@@ -68,7 +68,7 @@ Minimal schema for Slices 1–6. Types are indicative.
 ```text
 tiles
   id              uuid pk
-  scale           text not null   -- State | City | Town | Hood | Block | Plan
+  scale           text not null   -- Global | State | City | Town | Hood | Block | Plan
   east            bigint not null
   south           bigint not null
   status          text not null   -- draft | published
@@ -113,6 +113,8 @@ Rules:
 - A `guide` asset may exist on a tile that has no art yet (status can stay unpublished, or use a tile row with `status = draft` and only a guide asset). Prefer: **guide-only tiles are rows with no `web` asset**, still unpublished. Coverage then becomes a cheap query.
 - Replacing art writes a new `original`/`web`/`print` and keeps the old original if `tile_revisions` exists; until then, overwrite and accept the risk.
 - `content_sha256` makes uploads idempotent: same file + same `TileId` short-circuits.
+- Persist `east` / `south` already wrapped (`wrapFeet`). At most one Global row, always `(0, 0)`.
+- Coverage windows that cross a world edge wrap; do not store or query negative feet.
 
 ### Logical tile states
 

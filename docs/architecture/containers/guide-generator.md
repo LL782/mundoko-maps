@@ -75,7 +75,7 @@ Canvas:
   CELL   = 2400 / N     // 120, 480, 1200, or 240
 ```
 
-A City guide overlays its State parent and a 5×5 of Town children — not Hood.
+A City guide overlays its State parent and a 5×5 of Town children — not Hood. A State guide overlays the Global parent and a 20×20 of Cities. A Global guide has no parent crop; its mosaic is the 20×20 of States, and cells that sit on a world edge continue on the opposite edge of the same mosaic.
 
 Opacity: start at **0.35** parent, **0.45** children (children are the detail the artist is consolidating or extending). Adjust after the first real print; store as constants, not UI sliders, in v1.
 
@@ -126,7 +126,7 @@ v1 invalidation: set `guides_stale = true` on:
 - its parent (mosaic changed),
 - all children (parent crop changed) — can be a lot; **only mark the parent and the tile itself** if child fan-out is expensive. Artist can always click Download (force).
 
-Do not eagerly regenerate every related guide on each publish. Regeneration is pull-based (artist asked) plus optional “regenerate if stale and they open the tile page.” Worst-case fan-out is 400 children (State→City).
+Do not eagerly regenerate every related guide on each publish. Regeneration is pull-based (artist asked) plus optional “regenerate if stale and they open the tile page.” Worst-case fan-out is 400 children (Global→State or State→City).
 
 ## 8. Download artefact
 
@@ -170,7 +170,7 @@ Done when the artist can download a guide for a missing City square that ghosts 
 | Serverless timeout | Batches; web derivatives only; Fly.io escape hatch (ADR-008). |
 | Regenerating the world on each upload | Stale flags, pull-based generate. |
 | Using guides as explorer art | Viewer ignores `kind=guide` for public image. |
-| 400 R2 GETs cost / latency | Only State→City (N = 20). Parallelism cap (e.g. 8 at a time); still cheap on R2. |
+| 400 R2 GETs cost / latency | Global→State and State→City (N = 20). Parallelism cap (e.g. 8 at a time); still cheap on R2. |
 
 ## 12. Relationship to the old “map slice” notes
 

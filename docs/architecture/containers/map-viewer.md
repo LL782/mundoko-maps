@@ -95,9 +95,9 @@ The current prototype’s “generated tile” (parent ghost + a child mosaic) i
 
 | Action | Result |
 | --- | --- |
-| N / S / E / W | Adjacent `TileId` at the same scale (kernel `neighbour`) |
-| Scale up | Parent tile, same world point (no-op at State) |
-| Scale down | Child that contains the last click, or the centre child (no-op at Plan) |
+| N / S / E / W | Adjacent `TileId` at the same scale (kernel `neighbour`, wrapping). At Global this is the same tile. |
+| Scale up | Parent tile, same world point (no-op at Global) |
+| Scale down | Child that contains the last click, or a centre child (no-op at Plan). Even N (Global, State): south-east of the four cells that meet in the middle. |
 | “Start here” | Seeded published tile |
 | Keyboard | Arrow keys for neighbours; optional |
 
