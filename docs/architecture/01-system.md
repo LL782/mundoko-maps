@@ -99,18 +99,18 @@ When a limit is real — image jobs exceeding serverless timeouts, or the viewer
 
 ### 5.3 Shared domain kernel
 
-Not a container. A library every container imports. If this is wrong, guides mis-register and explorers see the wrong square.
+Not a container. A library every container imports. If this is wrong, guides mis-register and explorers see the wrong square. Full tables live in [domain-kernel.md](./domain-kernel.md).
 
 Responsibilities:
 
-- Scale enum: `Extra | Global | State | City | Town | Hood | Block | Floor` (names already in the prototype; exact feet-per-tile belongs in a later domain spec).
-- Tile identity: `(scale, east, south)` with a stable string id.
-- World size and wrapping (prototype uses a 100,000,000-foot world).
-- Parent tile of a tile; child tile window (prototype uses a **20 × 20** child grid, i.e. 400 children — matches 5% cells on a 20cm tile).
+- Scale enum: `State | City | Town | Hood | Block | Plan` (prototype `Floor` is Plan; Extra/Global are unspecified).
+- Tile identity: `(scale, east, south)` with a stable string id. Canonical unit: **feet** (miles on the sheet are approximate).
+- World size and wrapping (prototype uses a 100,000,000-foot world = 50 State tiles on an edge).
+- **Scale-pair nestings**, not a global child grid. A parent holds an N × N window of a given child, and N depends on the pair: 20, 10, 5, or 2 (400, 100, 25, or 4 children). A scale may have more than one parent and more than one child (e.g. City→Town *and* City→Hood). Kernel functions take an explicit parent/child scale.
 - Physical layout constants: 20cm printable square, millimetre grid semantics, A4 / US Letter print frame.
 - Status model: `missing` (not stored) · `guide` (generated only) · `draft` · `published`.
 
-Build this as pure functions with golden tests before any UI.
+Build this as pure functions with golden tests before any UI. Do not hard-code 20×20 / 400 / 5% cells outside the nesting table.
 
 ## 6. Deployment view
 
@@ -224,7 +224,7 @@ Ship vertical slices that a human can *see*, not layers that only a future slice
 
 ### Slice 0 — Domain kernel
 
-Pure TypeScript: scales, `TileId`, parent/child, wrapping. Vitest. No UI.
+Pure TypeScript: scales, `TileId`, scale-pair nestings (N × N per pair), wrapping. Vitest. No UI. Golden tests for every row in the [nesting table](./domain-kernel.md).
 
 ### Slice 1 — Tile Store + one published tile
 
@@ -244,7 +244,7 @@ Inngest + Sharp: validate, original + web + print derivatives, `draft` row. Prev
 
 ### Slice 5 — Guide Generator
 
-Parent crop (scale above) + child mosaic (20×20 below) + grid overlay. Download PNG. Cache on R2. Invalidate on publish.
+Parent crop + child mosaic for **chosen scale pairs** (N × N from the kernel, not always 20×20) + grid overlay. Download PNG. Cache on R2. Invalidate on publish.
 
 ### Slice 6 — Artist loop polish
 
@@ -287,15 +287,16 @@ Recorded here so future-you does not re-litigate them without new information.
 | ADR-006 | Guides are cached assets, not the source of truth | Accepted |
 | ADR-007 | Single-artist allowlist auth | Accepted |
 | ADR-008 | Extract a second deployable only when serverless time/memory is a measured problem | Accepted |
+| ADR-009 | Nestings are a scale-pair graph (N ∈ 2, 5, 10, 20), not a uniform 20×20 tree | Accepted |
 
-Revisit ADR-002 if a second author needs a full editorial workflow *and* we are already paying for engineering time. Revisit ADR-003 if Inngest step limits make 400-tile mosaics awkward — then a tiny Fly.io worker, not AWS.
+Revisit ADR-002 if a second author needs a full editorial workflow *and* we are already paying for engineering time. Revisit ADR-003 if Inngest step limits make 400-tile mosaics awkward (State→City and Town→Block only) — then a tiny Fly.io worker, not AWS.
 
 ## 15. Glossary
 
 | Term | Meaning |
 | --- | --- |
 | Tile | One 20cm square of the world at one scale, identified by `(scale, east, south)`. |
-| Scale | Nested zoom level (Extra … Floor). Child tiles subdivide a parent. |
+| Scale pair | An allowed parent↔child relationship with linear divisor N ∈ {2, 5, 10, 20}. |
 | Guide | Printable image that ghosts in parent/child context so the artist can draw the missing square. |
 | Detail | Finished (or draft) artwork for a tile. |
 | Coverage | Which squares at a scale have art, have only a guide, or are missing. |
@@ -305,11 +306,10 @@ Revisit ADR-002 if a second author needs a full editorial workflow *and* we are 
 
 ## 16. Open domain questions (do not block the stack)
 
-These are map-system questions, not vendor questions. Resolve them in a short domain spec during Slice 0.
+Feet-per-scale and child-grid sizes are **closed** — see [domain-kernel.md](./domain-kernel.md). Still open:
 
-- Exact feet (or miles) represented by 1mm / 5mm / 20cm at each scale, including the City-scale 19-mile quirk from the existing notes.
-- Whether every parent subdivides 20×20, or some scale steps differ.
 - Canonical encoding of `east` / `south` in URLs (the prototype uses truncated fractional paths).
 - How scanned art is registered to the 20cm square (crop marks vs “artist already cropped”).
+- Whether Extra / Global scales exist above State.
 
 The software containers above do not change when those answers land; only the kernel functions and a few overlay SVGs do.
