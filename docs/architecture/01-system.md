@@ -8,7 +8,7 @@ This is the high-level plan for the whole product: who uses it, which containers
 
 Story games need maps that stay consistent as you zoom from a continent down to a five-foot floorplan. Mundoko Maps is opinionated software around that problem:
 
-- An **artist** draws original map tiles on paper (or digitally) using auto-generated **guides** that show what already exists at the scale above and below.
+- An **artist** draws original map tiles on paper (or digitally) using auto-generated **guides**. A guide is a stack of layers (existing tile, an uploaded reference, parent, children) the artist can show, hide, reorder, and fade. The same loop covers a missing square and a redraw of a square that already has art.
 - The system **captures** those drawings as tiles with coordinates, scale, and images.
 - An **explorer** browses the world in a browser, at whatever detail has been drawn so far.
 
@@ -45,9 +45,9 @@ Five containers, matching the vision diagram, implemented as **modules in one ap
 | --- | --- | --- |
 | [Tile Store](./containers/tile-store.md) | Custom CMS | Store, manage, and deliver map images and tile records. |
 | [Map Viewer](./containers/map-viewer.md) | Public UI | Lay out maps at the correct scale and position. |
-| [Map Administrator](./containers/map-administrator.md) | Author UI | Upload tile art, inspect coverage, download guides. |
+| [Map Administrator](./containers/map-administrator.md) | Author UI | Coverage, guide compositor, upload, publish. |
 | [Detail Capture](./containers/detail-capture.md) | Background jobs | Turn an uploaded image into metadata + tile assets. |
-| [Guide Generator](./containers/guide-generator.md) | Background jobs | Compose a printable guide from parent and/or child tiles. |
+| [Guide Generator](./containers/guide-generator.md) | Background jobs | Compose a printable guide from stacked layers (existing tile, upload, parent, children). |
 
 A sixth *logical* piece is not a container: the **shared domain kernel** (scales, coordinates, parent/child math, tile identity). It is a TypeScript package imported by every container. Get this right first; everything else is plumbing.
 
@@ -108,7 +108,7 @@ Responsibilities:
 - World size and wrapping (prototype uses a 100,000,000-foot world = 50 State tiles on an edge).
 - **Adjacent nestings**, not a global child grid. Order is State → City → Town → Hood → Block → Plan. Each step has its own N × N window (20, 5, 2, 10, 5). Skip-level pairs on the 2022 sheet (City↔Hood, Town↔Block) are ignored. `parentTile` / `childTiles` need no scale argument.
 - Physical layout constants: 20cm printable square, millimetre grid semantics, A4 / US Letter print frame.
-- Status model: `missing` (not stored) · `guide` (generated only) · `draft` · `published`.
+- Status model: `missing` (not stored) · `guide` (generated only) · `draft` · `published`. A published tile may also have a **pending** replacement; explorers keep seeing the live art until the artist publishes.
 
 Build this as pure functions with golden tests before any UI. Do not hard-code 20×20 / 400 / 5% cells outside the nesting table.
 
@@ -140,16 +140,18 @@ Production secrets: Vercel env vars only. R2 access keys, `AUTH_SECRET`, Neon UR
 
 ## 7. Core workflows
 
-### 7.1 Artist fills a missing square
+### 7.1 Artist draws or redraws a square
+
+Same loop for a missing square and for a tile that already has art.
 
 1. Artist signs into Map Administrator, opens a coverage view at a scale.
-2. Clicks a missing coordinate.
-3. Administrator asks Guide Generator for a guide for that `TileId`.
-4. Generator reads parent and children from Tile Store, composites a 20cm guide (faint parent crop + faint child mosaic + grid + margins + title), stores it, returns a download URL.
-5. Artist prints at 100%, draws, scans or photographs.
-6. Artist uploads the image against that `TileId`.
-7. Detail Capture validates, stores the original, writes web/print derivatives, upserts the tile as `draft`.
-8. Artist previews in the same tile stage the explorer uses, then publishes.
+2. Clicks a coordinate (empty, draft, or published).
+3. On the tile page they arrange a **guide recipe**: which layers are on, in what order, at what opacity. The four inputs are **existing tile**, **uploaded image**, **parent generated guide**, and **children generated guide**. A millimetre grid overlay can sit on top. Missing inputs are simply absent.
+4. Administrator asks Guide Generator for a guide for that `TileId` + recipe. The generator composites a 20cm PNG, stores it, returns a download URL.
+5. Artist prints at 100%, draws or retouches, scans or photographs.
+6. Artist uploads the finished image against that `TileId` (this is tile art, not the guide’s optional reference image).
+7. Detail Capture validates, stores the original, writes web/print derivatives. If the square was empty, the tile becomes `draft`. If it was already **published**, the new files land as a **pending** replacement — explorers still see the live art.
+8. Artist previews the pending (or draft) art on the same tile stage the explorer uses, then publishes. Publish is what swaps live art; it is never implied by upload.
 9. Map Viewer reads the published tile. Neighbouring cached guides are marked stale.
 
 ### 7.2 Explorer browses
@@ -167,7 +169,7 @@ Production secrets: Vercel env vars only. R2 access keys, `AUTH_SECRET`, Neon UR
 | Artist original scan | Yes (private-ish; not the public CDN path) |
 | Web derivative (WebP) | Yes, public, content-hashed |
 | Print derivative | Yes |
-| Generated guide | Yes, as a cache, invalidate on parent/child change |
+| Generated guide | Yes, as a cache keyed by tile + recipe + input hashes |
 | Coverage / “what’s missing?” | Query: all stored tiles in a window vs the expected grid |
 
 ## 8. Interface style between containers
@@ -186,7 +188,7 @@ Event names (stable):
 
 - `tile/uploaded` — starts Detail Capture.
 - `tile/processed` — capture finished; may enqueue guide invalidation.
-- `guide/requested` — starts Guide Generator for a `TileId`.
+- `guide/requested` — starts Guide Generator for a `TileId` and layer recipe.
 - `tile/published` — invalidates viewer cache and related guides.
 
 ## 9. Security and abuse (right-sized)
@@ -240,15 +242,15 @@ Login. Coverage grid (stored vs missing) for one scale. Upload an image *to a kn
 
 ### Slice 4 — Detail Capture
 
-Inngest + Sharp: validate, original + web + print derivatives, `draft` row. Preview in admin using the viewer stage. Publish action.
+Inngest + Sharp: validate, original + web + print derivatives. First art on a square is `draft`. A replacement of published art is **pending** and does not unpublish. Preview in admin using the viewer stage. Publish action.
 
 ### Slice 5 — Guide Generator
 
-Parent crop + child mosaic for the **adjacent** scales (N × N from the kernel, not always 20×20) + grid overlay. Download PNG. Cache on R2. Invalidate on publish.
+Layer compositor: existing tile, uploaded reference, parent crop, child mosaic (N × N for the adjacent step). Admin can toggle, reorder, and set opacity; Sharp bakes the PNG. Cache on R2 by recipe. Invalidate when inputs change.
 
 ### Slice 6 — Artist loop polish
 
-Printable PDF/A4 frame, scale bars and keys per scale, stale-guide badges, basic versioning (replace a tile, keep previous original).
+Printable PDF/A4 frame, scale bars and keys per scale, stale-guide badges, keep previous originals after a published replacement.
 
 ### Slice 7 — Only if needed
 
@@ -259,8 +261,8 @@ Do **not** start with the guide generator or a generic CMS. The viewer + one rea
 ## 12. Quality bar
 
 - Domain math has tests; a wrong parent crop is a product bug.
-- Jobs are idempotent: same upload or same `TileId` guide request can be retried.
-- Published viewer pages are cacheable; drafts never leak onto the public CDN.
+- Jobs are idempotent: same upload or same `TileId` + recipe guide request can be retried.
+- Published viewer pages are cacheable; drafts and pending replacements never leak onto the public CDN.
 - Print at 100% yields a 20cm square. Check this on real A4, not only on screen.
 - One `README` command to run locally: app + Inngest. Document the two env files.
 
@@ -288,6 +290,8 @@ Recorded here so future-you does not re-litigate them without new information.
 | ADR-007 | Single-artist allowlist auth | Accepted |
 | ADR-008 | Extract a second deployable only when serverless time/memory is a measured problem | Accepted |
 | ADR-009 | Nestings are an adjacent ladder; N varies by step; skip-level pairs are ignored | Accepted |
+| ADR-010 | Guides are a layer compositor (existing tile, upload, parent, children); the artist sets visibility, order, and opacity | Accepted |
+| ADR-011 | Published art stays live until the artist publishes a replacement | Accepted |
 
 Revisit ADR-002 if a second author needs a full editorial workflow *and* we are already paying for engineering time. Revisit ADR-003 if Inngest step limits make the State→City 400-tile mosaic awkward — then a tiny Fly.io worker, not AWS.
 
@@ -297,9 +301,9 @@ Revisit ADR-002 if a second author needs a full editorial workflow *and* we are 
 | --- | --- |
 | Tile | One 20cm square of the world at one scale, identified by `(scale, east, south)`. |
 | Scale | One of State, City, Town, Hood, Block, Plan. Adjacent steps only; child grid N depends on the step. |
-| Guide | Printable image that ghosts in parent/child context so the artist can draw the missing square. |
-| Detail | Finished (or draft) artwork for a tile. |
-| Coverage | Which squares at a scale have art, have only a guide, or are missing. |
+| Guide | Printable 20cm composite the artist draws on. Layers: existing tile, uploaded reference, parent-generated guide, children-generated guide — each togglable, reorderable, opacity-controlled. |
+| Detail | Finished (or draft / pending) artwork for a tile. |
+| Coverage | Which squares at a scale have art, have only a guide, or are missing. Published squares may also show a pending replacement in admin. |
 | Tile Store | The custom CMS: metadata DB + image bucket + delivery. |
 | Explorer | Unauthenticated guest browsing published maps. |
 | Artist | Allowlisted author who uploads details and downloads guides. |

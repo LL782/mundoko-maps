@@ -20,7 +20,7 @@ Updated C4 views (custom CMS, Inngest + Sharp, explorers go through the app):
    2. [Map Viewer](./containers/map-viewer.md) — public explorer site.
    3. [Map Administrator](./containers/map-administrator.md) — artist site.
    4. [Detail Capture](./containers/detail-capture.md) — turn uploads into tiles.
-   5. [Guide Generator](./containers/guide-generator.md) — printable drawing guides.
+   5. [Guide Generator](./containers/guide-generator.md) — printable drawing guides (layer compositor; missing or existing tiles).
 
 ## Constraint that drives every choice
 
