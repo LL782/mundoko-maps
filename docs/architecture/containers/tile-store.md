@@ -15,12 +15,12 @@ This is not a general CMS. No page builder, no rich-text blog, no content-model 
 ## 2. Responsibilities
 
 - Persist tile records keyed by `(scale, east, south)`.
-- Persist assets (original, web, print, guide) in object storage.
-- Enforce uniqueness: at most one *current* tile per coordinate per scale.
+- Persist assets (original, web, print, guide, optional guide-reference upload) in object storage.
+- Enforce uniqueness: at most one *live* tile per coordinate per scale. A published tile may also hold **pending** replacement assets.
 - Answer coverage queries for a bounding window.
 - Resolve parent and children via the domain kernel, then fetch whatever records exist.
-- Publish / unpublish (draft vs public).
-- Issue public URLs for published web images; keep originals off the public path.
+- Publish / unpublish (draft vs public). Publish of a replacement **swaps** pending → live; it does not require unpublishing first.
+- Issue public URLs for **live** published web images; keep originals and pending derivatives off the public path.
 - Record job status related to a tile (so admin can poll without talking to Inngest).
 
 Out of scope:
@@ -82,14 +82,16 @@ tiles
 assets
   id              uuid pk
   tile_id         uuid fk tiles
-  kind            text not null   -- original | web | print | guide
+  kind            text not null   -- original | web | print | guide | reference
+  slot            text not null   -- live | pending   (guides/references can stay live)
   storage_key     text not null   -- R2 key
-  public_url      text            -- null for original
+  public_url      text            -- null unless kind=web and slot=live and tile is published
   width_px        int
   height_px       int
   bytes           int
   mime            text
   content_sha256  text not null
+  recipe_hash     text            -- guides only: recipe + input SHAs
   created_at      timestamptz
 
 jobs
@@ -110,17 +112,21 @@ tile_revisions
 Rules:
 
 - **No row** means missing. Do not insert placeholder empties.
-- A `guide` asset may exist on a tile that has no art yet (status can stay unpublished, or use a tile row with `status = draft` and only a guide asset). Prefer: **guide-only tiles are rows with no `web` asset**, still unpublished. Coverage then becomes a cheap query.
-- Replacing art writes a new `original`/`web`/`print` and keeps the old original if `tile_revisions` exists; until then, overwrite and accept the risk.
-- `content_sha256` makes uploads idempotent: same file + same `TileId` short-circuits.
+- A `guide` asset may exist on a tile that has no art yet. Prefer: **guide-only tiles are rows with no live `web` asset**, still unpublished. Coverage then becomes a cheap query.
+- First capture on a square writes `kind=web|print|original` with `slot=live` and `status=draft`.
+- Capture on a **published** tile writes the same kinds with `slot=pending`. Status stays `published`. Live public URLs do not change.
+- Publish promotes pending → live (and may copy the old live original into `tile_revisions` when that table exists). Until Slice 6, keep the old hashed objects; do not delete on swap.
+- `content_sha256` makes uploads idempotent: same file + same `TileId` + same slot short-circuits.
+- Unique among current rows: `(tile_id, kind, slot)` for original/web/print. Guides are unique on `(tile_id, recipe_hash)`.
 
 ### Logical tile states
 
 ```text
-missing     → no row
-guide_only  → row, guide asset, no web art
-draft       → web art, not published
-published   → web art, public
+missing       → no row
+guide_only    → row, guide asset, no web art
+draft         → live web art, not published
+published     → live web art, public
+published+pending → live web art still public; pending web art only in admin
 ```
 
 ## 6. Repository API (in-process)
@@ -129,18 +135,18 @@ The rest of the app depends on this module, not on SQL.
 
 ```ts
 getTile(id: TileId): Promise<Tile | null>
-getAsset(id: TileId, kind: AssetKind): Promise<Asset | null>
+getAsset(id: TileId, kind: AssetKind, slot?: 'live' | 'pending'): Promise<Asset | null>
 listCoverage(scale, window: Bounds): Promise<CoverageCell[]>
 listChildren(id: TileId): Promise<Tile[]> // 0–N² existing rows of the step below
 getParent(id: TileId): Promise<Tile | null>
-upsertDraft(id: TileId, fields): Promise<Tile>
-publish(id: TileId): Promise<void>
+upsertPendingArt(id: TileId, fields): Promise<Tile> // draft if unpublished; pending if published
+publish(id: TileId): Promise<void> // promote pending or draft → live published
 unpublish(id: TileId): Promise<void>
 putAsset(id: TileId, kind, bytes, meta): Promise<Asset>
 createJob(...) / updateJob(...) / getJob(...)
 ```
 
-`CoverageCell` is `{ tileId, state }` for every square in the window, including `missing`. The store *computes* missing by walking the window in the domain kernel and left-joining rows.
+`CoverageCell` is `{ tileId, state }` for every square in the window, including `missing`. State includes `published_pending` when live art is public and a replacement is in flight. The store *computes* missing by walking the window in the domain kernel and left-joining rows.
 
 ## 7. Object key layout
 
@@ -148,7 +154,8 @@ createJob(...) / updateJob(...) / getJob(...)
 originals/{tileId}/{sha}.bin     # private
 web/{sha}.webp                   # public, hash-only so republish can reuse
 print/{sha}.png
-guides/{tileId}/{sha}.png        # public or auth’d; not the explorer default
+guides/{tileId}/{recipeHash}.png # artist download; not the explorer default
+references/{tileId}/{sha}.bin    # private; guide uploaded-image layer
 ```
 
 Hash-addressed web images mean a publish that didn’t change pixels does not bust caches.
@@ -163,8 +170,8 @@ Hash-addressed web images mean a publish that didn’t change pixels does not bu
 
 **Artist (Administrator):**
 
-- Same public URLs for published web assets.
-- Presigned URLs for originals and unpublished derivatives (short TTL).
+- Same public URLs for **live** published web assets. Pending web is presigned, like originals.
+- Presigned URLs for originals, pending derivatives, and guide reference uploads (short TTL).
 
 **Jobs:**
 
@@ -179,7 +186,8 @@ Index:
 ```sql
 create unique index tiles_coord on tiles (scale, east, south);
 create index tiles_scale_status on tiles (scale, status);
-create index assets_tile_kind on assets (tile_id, kind);
+create unique index assets_tile_kind_slot on assets (tile_id, kind, slot) where kind in ('original', 'web', 'print');
+create unique index assets_guide_recipe on assets (tile_id, recipe_hash) where kind = 'guide';
 ```
 
 If coverage windows ever get large, do not materialise missing cells in SQL; generate the grid in the kernel and query `WHERE scale = $1 AND east BETWEEN $2 AND $3 AND south BETWEEN $4 AND $5`.
@@ -191,7 +199,7 @@ Capture and guide generation are asynchronous.
 - Insert a `jobs` row as `queued` in the same request that uploads (or that asks for a guide).
 - The Inngest function updates that row.
 - On success, assets appear; the UI reloads the tile.
-- Failed jobs leave the previous published web asset in place (if any). Never publish a half-written image: write a new hashed object, then point the `assets` row at it.
+- Failed jobs leave the previous **live** published web asset in place (if any). Never publish a half-written image: write a new hashed object in `pending` (or `live` if unpublished), then point the `assets` row at it.
 
 ## 11. Backup and lock-in
 
@@ -204,7 +212,7 @@ Capture and guide generation are asynchronous.
 Slice 1 deliverable:
 
 - Migrations for `tiles`, `assets`, `jobs`.
-- `tileStore` module with `getTile`, `putAsset`, `upsertDraft`.
+- `tileStore` module with `getTile`, `putAsset`, `upsertPendingArt`.
 - Script: `pnpm tiles:seed` uploads one City-scale image and prints its public URL.
 - No admin UI yet.
 

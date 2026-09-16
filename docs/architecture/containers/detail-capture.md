@@ -20,8 +20,8 @@ It does not decide *where* the tile sits — the Administrator already bound the
   - **original** — bytes as uploaded, private.
   - **web** — WebP, max edge suited to the viewer (e.g. 2048px), sRGB.
   - **print** — PNG (or high-quality JPEG), long edge suited to ~300dpi over 20cm (~2400px). Upscale is *not* required; never invent detail.
-- Upsert the tile as `draft` with width/height metadata.
-- Be **idempotent** on `(tileId, content_sha256)`.
+- Upsert art onto the `TileId`: **draft** if the square is unpublished; **pending** if it is already published (do not change `status`, do not change live public URLs).
+- Be **idempotent** on `(tileId, content_sha256, slot)`.
 - Mark related guides stale.
 - Write success/failure onto the `jobs` row.
 
@@ -66,7 +66,7 @@ tile/uploaded
     ├─ step: put original in originals/ (if not already)
     ├─ step: encode web WebP → put web/
     ├─ step: encode print PNG → put print/
-    ├─ step: upsert tile draft + asset rows (transaction)
+    ├─ step: upsert pending or draft asset rows (transaction; do not unpublish)
     ├─ step: mark neighbouring guides stale
     └─ step: job = succeeded
 ```
@@ -93,7 +93,7 @@ Tune with real scans; start strict enough to catch garbage.
 | Min short edge | ≥ 1200px (warn in job message if < 2000px: “print will be soft”) |
 | Aspect ratio | Within ~5% of square; if not, **do not auto-crop** — fail with “crop to square and re-upload” |
 
-Failing jobs: `jobs.status = failed`, human-readable `error`. Leave any previous draft in place.
+Failing jobs: `jobs.status = failed`, human-readable `error`. Leave any previous live published art in place.
 
 ## 6. Event contract
 
@@ -113,8 +113,10 @@ On success the function may emit `tile/processed` (used to invalidate guides). A
 
 ## 7. Idempotency and replacement
 
-- If the same SHA is already the current original for that tile, mark the job succeeded and skip encodes.
-- A *new* SHA replaces `web`/`print` keys on the tile (new hashed objects).
+- If the same SHA is already the original in the slot this job would write (`live` for unpublished, `pending` for published), mark the job succeeded and skip encodes.
+- A *new* SHA writes new hashed `web`/`print`/`original` objects.
+- If the tile is **published**, those objects are `slot=pending`. Live explorer URLs stay put.
+- If the tile is missing or draft-only, those objects are `slot=live` and `status=draft`.
 - Do not publish. The artist previews and publishes in Admin.
 
 ## 8. Local development
@@ -143,7 +145,7 @@ Slice 4 deliverable:
 - Stub-to-real: replace “copy inbound to web/” with Sharp derivatives.
 - Admin preview shows the web asset.
 
-Done when a square JPEG uploaded in Admin appears as a draft on `TileStage` without committing binaries to git.
+Done when a square JPEG uploaded in Admin appears as a draft on `TileStage` without committing binaries to git. Uploading over a published tile must leave the explorer image unchanged until Publish.
 
 ## 11. Risks
 

@@ -110,11 +110,11 @@ Do not infinite-scroll a sea of tiles. This is a book of pages.
 const id = parseTileId(params)
 const tile = await tileStore.getTile(id)
 const web = tile?.status === 'published'
-  ? await tileStore.getAsset(id, 'web')
+  ? await tileStore.getAsset(id, 'web') // live slot only; pending replacements are admin-only
   : null
 ```
 
-- Drafts are invisible here.
+- Drafts and **pending** replacements are invisible here.
 - Guide-only rows are treated as empty for explorers (or a single “undrawn” pattern — product choice, default to empty grid).
 - Neighbour links do not need extra queries; the kernel computes ids. Optional: batch `listCoverage` to badge “has art” on the position bar.
 
@@ -150,7 +150,7 @@ SEO: unique titles per coordinate. Only index published tiles and the contents p
 Extract a `TileStage` component used by both UIs:
 
 - Props: `tileId`, `imageUrl | null`, `mode: 'public' | 'preview'`.
-- Preview mode may show draft watermarks and guide layers.
+- Preview mode may show draft or pending watermarks and the guide layer stack.
 
 Viewer pages wrap `TileStage` with public chrome. Admin pages wrap it with tools.
 

@@ -109,7 +109,7 @@ No `parentScale` / `childScale` arguments. Adjacent is implied.
 | --- | --- |
 | Tile Store | `getParent(id)`, `listChildren(id)` (0–N² existing rows). Coverage windows are independent of N. |
 | Map Viewer | Scale up = `parentTile`. Scale down = the child cell under the last click, or the centre child. No chooser. |
-| Guide Generator | One parent crop + one child mosaic. Mosaic is **N × N for the step below**, not always 20×20. 2400px canvas divides evenly by every N. Batch only when N is 10 or 20 (Hood→Block, State→City). |
+| Guide Generator | Parent-generated and children-generated layers use adjacent-step geometry. Child mosaic is **N × N for the step below**, not always 20×20. 2400px canvas divides evenly by every N. Batch only when N is 10 or 20 (Hood→Block, State→City). Existing-tile and upload layers are full-square and do not use N. |
 | Tests | One golden case per ladder step (N, feet, crop rect). Off-by-one here is a product bug. |
 
 ## 6. Still open (does not change nestings)
